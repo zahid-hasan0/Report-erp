@@ -22,7 +22,7 @@ exports.sendBuyerReport = functions.https.onRequest((req, res) => {
             });
 
             await transporter.sendMail({
-                from: '"GMS Trims Limited" <your.email@gmail.com>',
+                from: '"Report Erp" <your.email@gmail.com>',
                 to: to_email,
                 subject: subject,
                 html: html

@@ -140,13 +140,18 @@ export async function saveBooking(e) {
 }
 
 export function resetForm() {
-    document.getElementById('bookingForm').reset();
+    const form = document.getElementById('bookingForm');
+    if (!form) return;
+
+    form.reset();
     document.getElementById('editId').value = '';
 
     // Set default booking date to today
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('bookingDate').value = today;
+    const dateInput = document.getElementById('bookingDate');
+    if (dateInput) dateInput.value = today;
 }
+window.resetForm = resetForm;
 
 export async function editBooking(id) {
     const bookings = window.bookings || [];

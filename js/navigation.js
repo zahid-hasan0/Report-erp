@@ -27,7 +27,9 @@ export async function showPage(pageId) {
         'reportPage': 'nav-reports',
         'settingsPage': 'nav-settings',
         'merchandisingPage': 'nav-merchandising',
-        'merchandisingBuyersPage': 'nav-merchandising-buyers'
+        'merchandisingBuyersPage': 'nav-merchandising-buyers',
+        'myTasksPage': 'nav-my-tasks',
+        'myDiaryPage': 'nav-my-diary'
     };
 
     const titleMap = {
@@ -40,7 +42,9 @@ export async function showPage(pageId) {
         'reportPage': 'Analytics & Reports',
         'settingsPage': 'System Settings',
         'merchandisingPage': 'Packing List',
-        'merchandisingBuyersPage': 'Manage Buyers'
+        'merchandisingBuyersPage': 'Manage Buyers',
+        'myTasksPage': 'My Task Planner',
+        'myDiaryPage': 'Personal Diary'
     };
 
     // 1. Update Sidebar Active State
@@ -72,7 +76,9 @@ export async function showPage(pageId) {
         'reportPage': 'pages/reports.html',
         'settingsPage': 'pages/settings.html',
         'merchandisingPage': 'pages/merchandising.html',
-        'merchandisingBuyersPage': 'pages/merchandising-buyers.html'
+        'merchandisingBuyersPage': 'pages/merchandising-buyers.html',
+        'myTasksPage': 'pages/my-tasks.html',
+        'myDiaryPage': 'pages/my-diary.html'
     };
 
     let filePath = fileMap[pageId];
@@ -129,6 +135,7 @@ async function initPageScripts(pageId) {
         // Re-attach listeners for booking form
         if (window.setupBookingFormListeners) window.setupBookingFormListeners();
         if (window.setupTableListeners) window.setupTableListeners();
+        if (window.resetForm) window.resetForm();
 
         // Reload data to ensure table is fresh
         await loadBookings();
@@ -170,6 +177,14 @@ async function initPageScripts(pageId) {
     else if (pageId === 'merchandisingBuyersPage') {
         const { initMerchandisingBuyers } = await import('./merchandising.js');
         initMerchandisingBuyers();
+    }
+    else if (pageId === 'myTasksPage') {
+        const { initMyTasks } = await import('./myTasks.js');
+        initMyTasks();
+    }
+    else if (pageId === 'myDiaryPage') {
+        const { initMyDiary } = await import('./myDiary.js');
+        initMyDiary();
     }
 }
 
@@ -250,8 +265,8 @@ export function canAccessPage(pageId) {
     // "Settings" is strictly for Admin, unless we allow "My Profile" for users later
     if (pageId === 'settingsPage') return user.role === 'admin';
 
-    // "Home" (Welcome page) is safe for everyone
-    if (pageId === 'dashboardPage' && (!user.allowedModules || user.allowedModules.length === 0)) {
+    // "Home", "My Tasks", and "My Diary" are safe for everyone (Personal data)
+    if (pageId === 'dashboardPage' || pageId === 'myTasksPage' || pageId === 'myDiaryPage') {
         return true;
     }
 
@@ -272,7 +287,7 @@ window.updateSidebarAccess = function (user) {
     const embMenu = document.getElementById('embSubmenu');
 
     // All data modules
-    const moduleIds = ['nav-dashboard', 'nav-booking', 'nav-emb-entry', 'nav-emb-report', 'nav-buyer-notes', 'nav-buyers', 'nav-reports', 'nav-merchandising', 'nav-merchandising-buyers'];
+    const moduleIds = ['nav-dashboard', 'nav-booking', 'nav-emb-entry', 'nav-emb-report', 'nav-buyer-notes', 'nav-my-tasks', 'nav-my-diary', 'nav-buyers', 'nav-reports', 'nav-merchandising', 'nav-merchandising-buyers'];
 
     // Default: Hide all
     moduleIds.forEach(id => {
@@ -333,9 +348,18 @@ window.updateSidebarAccess = function (user) {
         }
     });
 
-    // Special: Dashboard is always shown for navigation but content is gated in showPage
+    // Dashboard and My Tasks are always shown for navigation
     const dashNav = document.getElementById('nav-dashboard');
     if (dashNav) dashNav.style.setProperty('display', 'flex', 'important');
+
+    const tasksNav = document.getElementById('nav-my-tasks');
+    if (tasksNav) tasksNav.style.setProperty('display', 'flex', 'important');
+
+    const diaryNav = document.getElementById('nav-my-diary');
+    if (diaryNav) diaryNav.style.setProperty('display', 'flex', 'important');
+
+    const personalDropdown = document.getElementById('nav-personal-dropdown');
+    if (personalDropdown) personalDropdown.style.setProperty('display', 'flex', 'important');
 
     if (hasTrimsAccess && trimsDropdown) {
         trimsDropdown.style.setProperty('display', 'flex', 'important');

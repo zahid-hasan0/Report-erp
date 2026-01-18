@@ -92,7 +92,9 @@ export function getModulePath(moduleName = 'bookings') {
     'emb_reports': 'emb job storage',
     'buyer_notes': 'merchandise_items',
     'merch_buyers': 'merchandise_buyers',
-    'merch_packing_list': 'merchandise_packing_list'
+    'merch_packing_list': 'merchandise_packing_list',
+    'my_tasks': 'personal_tasks',
+    'my_diary': 'personal_diary'
   };
   const actualName = nameMap[moduleName] || moduleName;
 
@@ -101,11 +103,13 @@ export function getModulePath(moduleName = 'bookings') {
 
   const user = JSON.parse(sessionStr);
 
-  // Shared root collections (No isolation)
-  if (moduleName === 'buyers' || moduleName === 'bookings' || moduleName === 'emb_reports' || moduleName === 'merch_buyers' || moduleName === 'merch_packing_list' || user.role === 'admin') {
+  // Shared root collections (No isolation for system-wide modules)
+  const isPersonalModule = moduleName === 'my_tasks' || moduleName === 'my_diary';
+
+  if (!isPersonalModule && (moduleName === 'buyers' || moduleName === 'bookings' || moduleName === 'emb_reports' || moduleName === 'merch_buyers' || moduleName === 'merch_packing_list' || user.role === 'admin')) {
     return actualName;
   }
 
-  // Other modules still isolated by user
+  // Personal modules and user-specific data are strictly isolated by username
   return `users/${user.username}/${actualName}`;
 }

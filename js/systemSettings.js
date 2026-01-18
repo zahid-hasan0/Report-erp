@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS = {
         activeMonth: "all",
         activeYear: "all"
     },
-    globalNotice: "Welcome to GMS Trims Booking System!"
+    globalNotice: "Welcome to Report Erp System!"
 };
 
 /**

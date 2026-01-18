@@ -326,18 +326,40 @@ function renderWhatsAppSettings() {
     renderTable("waFullBody", whatsapp.full_report || []);
 }
 
-window.addWhatsAppContact = async function (type) {
-    const name = await window.showPrompt("Enter contact name:");
-    if (!name) return;
-    const number = await window.showPrompt("Enter phone number (e.g. 017...):");
-    if (!number) return;
+window.addWhatsAppContact = function (type) {
+    const modalEl = document.getElementById('addContactModal');
+    if (!modalEl) return;
+
+    // Reset fields
+    document.getElementById('addContactTypeHidden').value = type;
+    document.getElementById('addContactName').value = '';
+    document.getElementById('addContactNumber').value = '';
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+};
+
+window.saveNewContact = async function () {
+    const type = document.getElementById('addContactTypeHidden').value;
+    const name = document.getElementById('addContactName').value.trim();
+    const number = document.getElementById('addContactNumber').value.trim();
+
+    if (!name || !number) {
+        showToast("Please enter both name and number.", "warning");
+        return;
+    }
 
     if (!currentSettings.whatsapp[type]) currentSettings.whatsapp[type] = [];
     currentSettings.whatsapp[type].push({ name, number });
 
     if (await setSystemSettings(currentSettings)) {
         renderWhatsAppSettings();
-        showToast("Contact added.");
+        showToast("Contact added successfully.", "success");
+
+        // Close Modal
+        const modalEl = document.getElementById('addContactModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
     }
 };
 

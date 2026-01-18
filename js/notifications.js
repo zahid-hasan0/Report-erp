@@ -26,12 +26,20 @@ export function initNotifications() {
         }
     });
 
-    // Strategy: Admin and User both listen on their respective paths from getBookingsPath()
-    // Admin = 'bookings' root, User = 'users/{name}/bookings'
+    // Strategy: Admin sees all, User sees only their own
     const path = getBookingsPath();
     const dbInstance = getActiveDb();
     console.log(`📡 Notifications: Monitoring path [${path}] ON ${dbInstance.app.options.projectId}`);
-    const q = query(collection(dbInstance, path), where("checkStatus", "==", "Unverified"));
+
+    let q;
+    if (user.role === 'admin') {
+        q = query(collection(dbInstance, path), where("checkStatus", "==", "Unverified"));
+    } else {
+        q = query(collection(dbInstance, path),
+            where("checkStatus", "==", "Unverified"),
+            where("createdBy", "==", user.username)
+        );
+    }
 
     startListener(q, user.role);
 }

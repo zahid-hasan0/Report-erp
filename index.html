@@ -48,7 +48,7 @@
             <div class="sidebar-header">
                 <a href="#" class="bg-brand">
                     <img src="./gms icon.png" alt="Logo" class="logo-img">
-                    <span>Report ERP</span>
+                    <span>Report Erp</span>
                 </a>
             </div>
 
@@ -134,15 +134,32 @@
                     </div>
                 </div>
 
-                <a onclick="showPage('buyerNotesPage')" class="nav-link" id="nav-buyer-notes">
-                    <i class="fas fa-sticky-note"></i>
-                    <span>Buyer Notes</span>
+                <!-- Personal Management Dropdown -->
+                <a class="nav-link collapsed d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" href="#personalSubmenu" role="button" aria-expanded="false"
+                    aria-controls="personalSubmenu" id="nav-personal-dropdown">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="far fa-user-circle"></i>
+                        <span>My Task</span>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8em; transition: transform 0.3s;"></i>
                 </a>
 
-
+                <div class="collapse" id="personalSubmenu">
+                    <div class="nav flex-column ms-3 ps-2" style="border-left: 2px solid rgba(255,255,255,0.1);">
+                        <a onclick="showPage('myTasksPage')" class="nav-link" id="nav-my-tasks">
+                            <i class="far fa-check-square"></i>
+                            <span>My Tasks</span>
+                        </a>
+                        <a onclick="showPage('myDiaryPage')" class="nav-link" id="nav-my-diary">
+                            <i class="far fa-sticky-note"></i>
+                            <span>My Diary</span>
+                        </a>
+                    </div>
+                </div>
 
                 <a onclick="showPage('settingsPage')" class="nav-link" id="nav-settings" style="cursor: pointer;">
-                    <i class="fas fa-cog"></i>
+                    <i class="fas fa-tools"></i>
                     <span>Settings</span>
                 </a>
             </nav>

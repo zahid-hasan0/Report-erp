@@ -8,7 +8,7 @@ const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';            // EmailJS থেকে প�
 const RECIPIENT_EMAIL = 'your-email@gmail.com';    // যে email এ পাঠাতে চান
 
 // EmailJS Initialize
-(function() {
+(function () {
     if (typeof emailjs !== 'undefined') {
         emailjs.init(EMAILJS_PUBLIC_KEY);
     }
@@ -24,55 +24,55 @@ const RECIPIENT_EMAIL = 'your-email@gmail.com';    // যে email এ পাঠ
 export function generatePDFReport(bookings, reportType = 'all', monthYear = '') {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('landscape', 'mm', 'a4');
-    
+
     // Page dimensions
     const pageWidth = doc.internal.pageSize.getWidth();
-    
+
     // ========== HEADER ==========
     // Company Logo/Name
     doc.setFillColor(8, 100, 207);
     doc.rect(0, 0, pageWidth, 35, 'F');
-    
+
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont(undefined, 'bold');
-    doc.text('GMS Trims Limited', pageWidth / 2, 12, { align: 'center' });
-    
+    doc.text('Report Erp', pageWidth / 2, 12, { align: 'center' });
+
     doc.setFontSize(12);
     doc.setFont(undefined, 'normal');
     doc.text('Shardagonj, Kashimpur, Gazipur, Bangladesh', pageWidth / 2, 20, { align: 'center' });
-    
+
     // Report Title
-    const reportTitle = reportType === 'monthly' 
-        ? `Monthly Booking Report - ${monthYear}` 
+    const reportTitle = reportType === 'monthly'
+        ? `Monthly Booking Report - ${monthYear}`
         : 'Complete Booking Report';
-    
+
     doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
     doc.text(reportTitle, pageWidth / 2, 30, { align: 'center' });
-    
+
     // ========== SUMMARY SECTION ==========
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    
+
     const currentDate = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
-    
+
     const totalBookings = bookings.length;
     const uniqueCustomers = [...new Set(bookings.map(b => b.customer))].length;
     const uniqueBuyers = [...new Set(bookings.map(b => b.buyer))].length;
     const verifiedCount = bookings.filter(b => b.checkStatus === 'Verified').length;
-    
+
     doc.text(`Report Generated: ${currentDate}`, 14, 45);
     doc.text(`Total Bookings: ${totalBookings}`, 14, 52);
     doc.text(`Unique Customers: ${uniqueCustomers}`, 80, 52);
     doc.text(`Unique Buyers: ${uniqueBuyers}`, 140, 52);
     doc.text(`Verified: ${verifiedCount}`, 200, 52);
-    
+
     // ========== TABLE DATA ==========
     const tableData = bookings.map(b => [
         b.bookingNo,
@@ -92,7 +92,7 @@ export function generatePDFReport(bookings, reportType = 'all', monthYear = '') 
         }) : '-',
         b.remarks || '-'
     ]);
-    
+
     // ========== AUTO TABLE ==========
     doc.autoTable({
         startY: 58,
@@ -123,7 +123,7 @@ export function generatePDFReport(bookings, reportType = 'all', monthYear = '') 
             6: { cellWidth: 25, halign: 'center' },
             7: { cellWidth: 35 }
         },
-        didDrawCell: function(data) {
+        didDrawCell: function (data) {
             // Color code for Status column
             if (data.column.index === 5 && data.section === 'body') {
                 const status = data.cell.raw;
@@ -148,7 +148,7 @@ export function generatePDFReport(bookings, reportType = 'all', monthYear = '') 
         },
         margin: { top: 58, bottom: 20, left: 14, right: 14 }
     });
-    
+
     // ========== FOOTER ==========
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -162,13 +162,13 @@ export function generatePDFReport(bookings, reportType = 'all', monthYear = '') 
             { align: 'center' }
         );
         doc.text(
-            '© 2025 GMS Trims Limited - Automated Booking System',
+            '© 2026 Report Erp - Automated Booking System',
             pageWidth / 2,
             doc.internal.pageSize.getHeight() - 5,
             { align: 'center' }
         );
     }
-    
+
     return doc.output('blob');
 }
 
@@ -178,20 +178,20 @@ export function generatePDFReport(bookings, reportType = 'all', monthYear = '') 
 export function downloadPDFReport(bookings, reportType = 'all', monthYear = '') {
     try {
         showToast('Generating PDF...', 'success');
-        
+
         const pdfBlob = generatePDFReport(bookings, reportType, monthYear);
-        
-        const fileName = reportType === 'monthly' 
+
+        const fileName = reportType === 'monthly'
             ? `Booking_Report_${monthYear.replace(/\s/g, '_')}.pdf`
             : `Complete_Booking_Report_${new Date().toISOString().split('T')[0]}.pdf`;
-        
+
         const url = URL.createObjectURL(pdfBlob);
         const link = document.createElement('a');
         link.href = url;
         link.download = fileName;
         link.click();
         URL.revokeObjectURL(url);
-        
+
         showToast('PDF downloaded successfully!', 'success');
     } catch (error) {
         console.error('PDF generation error:', error);
@@ -207,29 +207,29 @@ export async function emailPDFReport(bookings, reportType = 'all', monthYear = '
         showToast('EmailJS not loaded. Please refresh the page.', 'error');
         return;
     }
-    
+
     try {
         // Show loading
         showToast('Preparing email...', 'success');
-        
+
         // Generate PDF
         const pdfBlob = generatePDFReport(bookings, reportType, monthYear);
-        
+
         // Convert blob to base64
         const reader = new FileReader();
         reader.readAsDataURL(pdfBlob);
-        
-        reader.onloadend = async function() {
+
+        reader.onloadend = async function () {
             const base64data = reader.result.split(',')[1];
-            
-            const reportTitle = reportType === 'monthly' 
-                ? `Monthly Report - ${monthYear}` 
+
+            const reportTitle = reportType === 'monthly'
+                ? `Monthly Report - ${monthYear}`
                 : 'Complete Booking Report';
-            
-            const fileName = reportType === 'monthly' 
+
+            const fileName = reportType === 'monthly'
                 ? `Booking_Report_${monthYear.replace(/\s/g, '_')}.pdf`
                 : `Complete_Report_${new Date().toISOString().split('T')[0]}.pdf`;
-            
+
             // Email parameters
             const templateParams = {
                 to_email: RECIPIENT_EMAIL,
@@ -243,20 +243,20 @@ export async function emailPDFReport(bookings, reportType = 'all', monthYear = '
                 pdf_content: base64data,
                 pdf_filename: fileName
             };
-            
+
             // Send email
             showToast('Sending email...', 'success');
-            
+
             const response = await emailjs.send(
                 SERVICE_ID,
                 TEMPLATE_ID,
                 templateParams
             );
-            
+
             console.log('Email sent successfully:', response);
             showToast('✅ Email sent successfully!', 'success');
         };
-        
+
     } catch (error) {
         console.error('Email send error:', error);
         showToast('❌ Failed to send email: ' + (error.text || error.message), 'error');
