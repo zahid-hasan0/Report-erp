@@ -265,10 +265,7 @@ export function canAccessPage(pageId) {
     // "Settings" is strictly for Admin, unless we allow "My Profile" for users later
     if (pageId === 'settingsPage') return user.role === 'admin';
 
-    // "Home", "My Tasks", and "My Diary" are safe for everyone (Personal data)
-    if (pageId === 'dashboardPage' || pageId === 'myTasksPage' || pageId === 'myDiaryPage') {
-        return true;
-    }
+    // "Home" or other general pages can be added here if needed
 
     // Check specific permissions
     const allowed = user.allowedModules || [];
@@ -287,7 +284,7 @@ window.updateSidebarAccess = function (user) {
     const embMenu = document.getElementById('embSubmenu');
 
     // All data modules
-    const moduleIds = ['nav-dashboard', 'nav-booking', 'nav-emb-entry', 'nav-emb-report', 'nav-buyer-notes', 'nav-my-tasks', 'nav-my-diary', 'nav-buyers', 'nav-reports', 'nav-merchandising', 'nav-merchandising-buyers'];
+    const moduleIds = ['nav-dashboard', 'nav-booking', 'nav-emb-entry', 'nav-emb-report', 'nav-buyer-notes', 'nav-my-tasks', 'nav-my-diary', 'nav-buyers', 'nav-reports', 'nav-merchandising', 'nav-merchandising-buyers', 'nav-personal-dropdown'];
 
     // Default: Hide all
     moduleIds.forEach(id => {
@@ -311,6 +308,9 @@ window.updateSidebarAccess = function (user) {
         if (embDropdown) embDropdown.style.setProperty('display', 'flex', 'important');
         const merchDropdown = document.getElementById('nav-merchandising-dropdown');
         if (merchDropdown) merchDropdown.style.setProperty('display', 'flex', 'important');
+
+        const personalDropdown = document.getElementById('nav-personal-dropdown');
+        if (personalDropdown) personalDropdown.style.setProperty('display', 'flex', 'important');
         return;
     }
 
@@ -348,18 +348,23 @@ window.updateSidebarAccess = function (user) {
         }
     });
 
-    // Dashboard and My Tasks are always shown for navigation
-    const dashNav = document.getElementById('nav-dashboard');
-    if (dashNav) dashNav.style.setProperty('display', 'flex', 'important');
-
-    const tasksNav = document.getElementById('nav-my-tasks');
-    if (tasksNav) tasksNav.style.setProperty('display', 'flex', 'important');
-
-    const diaryNav = document.getElementById('nav-my-diary');
-    if (diaryNav) diaryNav.style.setProperty('display', 'flex', 'important');
+    // Personal modules logic (My Tasks, My Diary)
+    let hasPersonalAccess = false;
+    if (allowed.includes('myTasksPage')) {
+        const el = document.getElementById('nav-my-tasks');
+        if (el) el.style.setProperty('display', 'flex', 'important');
+        hasPersonalAccess = true;
+    }
+    if (allowed.includes('myDiaryPage')) {
+        const el = document.getElementById('nav-my-diary');
+        if (el) el.style.setProperty('display', 'flex', 'important');
+        hasPersonalAccess = true;
+    }
 
     const personalDropdown = document.getElementById('nav-personal-dropdown');
-    if (personalDropdown) personalDropdown.style.setProperty('display', 'flex', 'important');
+    if (personalDropdown && hasPersonalAccess) {
+        personalDropdown.style.setProperty('display', 'flex', 'important');
+    }
 
     if (hasTrimsAccess && trimsDropdown) {
         trimsDropdown.style.setProperty('display', 'flex', 'important');

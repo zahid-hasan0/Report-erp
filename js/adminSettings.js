@@ -187,6 +187,9 @@ window.openUserManagementModal = function (username) {
     const defaultPageSelect = document.getElementById('manageDefaultPage');
     if (defaultPageSelect) defaultPageSelect.value = user.defaultPage || 'dashboardPage';
 
+    const zoomLevelSelect = document.getElementById('manageZoomLevel');
+    if (zoomLevelSelect) zoomLevelSelect.value = user.zoomLevel || '100';
+
     // 2. Populate Privileges Tab
     const modules = user.allowedModules || [];
     document.querySelectorAll('.perm-check').forEach(check => {
@@ -226,7 +229,8 @@ window.saveUserManagement = async function () {
     const updateData = {
         role: newRole,
         allowedModules: allowedModules,
-        defaultPage: defaultPageSelect ? defaultPageSelect.value : 'dashboardPage'
+        defaultPage: defaultPageSelect ? defaultPageSelect.value : 'dashboardPage',
+        zoomLevel: document.getElementById('manageZoomLevel') ? document.getElementById('manageZoomLevel').value : '100'
     };
     if (newPassword) updateData.password = newPassword;
 

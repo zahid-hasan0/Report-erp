@@ -12,6 +12,21 @@ import { loadUserProfile, initProfileDropdown } from "./profileManagement.js";
 import { initAnnouncements } from "./announcements.js";
 import { initMerchandisingGlobal } from "./merchandising.js";
 
+// --- Zoom Level Application ---
+export function applyUserZoom() {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const zoom = user.zoomLevel || '100';
+    console.log(`🔍 Applying User Zoom: ${zoom}%`);
+    document.body.style.zoom = `${zoom}%`;
+}
+window.applyUserZoom = applyUserZoom;
+window.updateSidebarAccess = (function (orig) {
+    return function (user) {
+        if (typeof orig === 'function') orig(user);
+        applyUserZoom();
+    };
+})(window.updateSidebarAccess);
+
 // 1. Initialize Auth Guard immediately (for redirects)
 initAuthGuard();
 
@@ -54,6 +69,7 @@ window.addEventListener('load', async () => {
 
         console.log(`➡️ Redirecting to default page: ${defaultPage}`);
         showPage(defaultPage);
+        applyUserZoom();
     } catch (error) {
         console.error('❌ Error loading data:', error);
         showToast('Error loading data. Please refresh.', 'error');

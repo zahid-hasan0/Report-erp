@@ -116,6 +116,7 @@ export function initAuthGuard() {
                     user.fullName = newData.fullName;
                     user.username = newData.username;
                     user.defaultPage = newData.defaultPage; // Sync default page preference
+                    user.zoomLevel = newData.zoomLevel || '100'; // Sync zoom level
 
                     localStorage.setItem('currentUser', JSON.stringify(user));
                     window.currentUserData = user;
