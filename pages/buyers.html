@@ -1,0 +1,78 @@
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>
+                    <i class="fas fa-users me-2" style="color: #3b82f6;"></i>
+                    Buyer Management
+                </h2>
+                <!-- Internal Button Removed -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Buyer -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-plus-circle me-2 text-success"></i>
+                        Add New Buyer
+                    </h5>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="newBuyerName" placeholder="Enter buyer name...">
+                        <button class="btn btn-success" onclick="addBuyer()">
+                            <i class="fas fa-plus me-2"></i>Add Buyer
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-tools me-2 text-warning"></i>
+                        Fix Existing Buyers
+                    </h5>
+                    <button class="btn btn-warning w-100" onclick="fixExistingBuyerNames()">
+                        <i class="fas fa-wrench me-2"></i>
+                        Fix Buyer Names in Bookings
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<br>
+
+<!-- Buyer List Table Section -->
+<div class="row mb-4 mt-5">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2" style="color: #68023d;"></i>
+                    All Buyers List
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="buyerListContainer">
+                    <div class="text-center py-4" style="color: #64748b;">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                        <p>Loading buyers...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

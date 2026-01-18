@@ -1,0 +1,145 @@
+<link rel="stylesheet" href="assets/css/dashboard.css">
+
+<div class="container-fluid p-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 dashboard-title">Dashboard Overview</h2>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Internal Button Removed -->
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Total Bookings</p>
+                            <h3 class="fw-bolder mb-0" id="totalBookings">0</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-book fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #10b981;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">This Month</p>
+                            <h3 class="fw-bolder mb-0 text-success" id="monthBookings">0</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-calendar-check fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #f59e0b;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Total Customers</p>
+                            <h3 class="fw-bolder mb-0 text-warning" id="totalCustomers">0</h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-users fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" style="border-left-color: #8b5cf6;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Total Buyers</p>
+                            <h3 class="fw-bolder mb-0 text-info" id="totalBuyers">0</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-shopping-bag fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <!-- Charts Stacked Vertically -->
+    <div class="row g-4">
+        <!-- Chart 1: Monthly Booking -->
+        <div class="col-12">
+            <div class="card monthly-chart-card h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-chart-bar text-primary me-2"></i> Monthly Booking Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper w-100" style="height: 450px;">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Monthly Customer -->
+        <div class="col-12">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-chart-line text-success me-2"></i> Monthly Customer Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper w-100" style="height: 450px;">
+                        <canvas id="customerMonthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 3: Top Customers -->
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-chart-pie text-warning me-2"></i> Top Customers Distribution
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper w-100" style="height: 550px;">
+                        <canvas id="customerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 4: Top Buyers -->
+        <div class="col-12">
+            <div class="card top-buyers-card h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-chart-pie text-info me-2"></i> Top Buyers Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrapper w-100" style="height: 600px;">
+                        <canvas id="buyerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

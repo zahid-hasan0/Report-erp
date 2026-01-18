@@ -1,0 +1,185 @@
+<link rel="stylesheet" href="assets/css/booking.css">
+
+<div class="container-fluid p-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Booking Management</h2>
+        </div>
+        <div>
+            <!-- Buttons Removed -->
+        </div>
+    </div>
+
+    <!-- Entry Form (Static Card) -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-bottom-0">
+            <h5 class="fw-bold mb-0 text-primary"><i class="fas fa-edit me-2"></i>Booking Entry Form</h5>
+        </div>
+        <div class="card-body">
+            <form id="bookingForm" class="row g-4">
+                <input type="hidden" id="editId">
+
+                <!-- Row 1: Key Details -->
+                <div class="col-md-3">
+                    <label class="form-label">Booking Number <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="bookingNo" required placeholder="Enter your Booking No">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+                    <select class="form-select" id="customer" required>
+                        <option value=""> -- Select Customer --</option>
+                        <option value="GMS Composite">GMS Composite</option>
+                        <option value="GMS Textile">GMS Textile</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Buyer <span class="text-danger">*</span></label>
+                    <div class="dropdown custom-search-dropdown" id="buyerDropdownContainer">
+                        <button
+                            class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button" id="buyerDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="selectedBuyerLabel">-- Select Buyer --</span>
+                            <i class="fas fa-chevron-down small"></i>
+                        </button>
+                        <div class="dropdown-menu w-100 p-0 shadow-sm" aria-labelledby="buyerDropdownBtn">
+                            <div class="p-2 border-bottom sticky-top bg-white">
+                                <input type="text" class="form-control form-control-sm" id="buyerSearchInput"
+                                    placeholder="Search buyer..." autocomplete="off">
+                            </div>
+                            <div id="buyerOptionsList">
+                                <!-- Options populated via JS -->
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="buyer" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Booking Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="bookingDate" required>
+                </div>
+
+                <!-- Row 2: Item & Verification -->
+                <div class="col-md-3">
+                    <label class="form-label">Item Description</label>
+                    <input type="text" class="form-control" id="item" placeholder="Enter item description...">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Check Status</label>
+                    <select class="form-select" id="checkStatus" required>
+                        <option value="Unverified">Unverified</option>
+                        <option value="Verified">Verified</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Check Date <small class="text-muted">(Optional)</small></label>
+                    <input type="date" class="form-control" id="checkDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Remarks <small class="text-muted">(Optional)</small></label>
+                    <input type="text" class="form-control" id="remarks" placeholder="Additional notes or comments">
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-save me-2"></i>Save Booking
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                        <i class="fas fa-times me-2"></i>Clear Form
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <br><br>
+    <div class="card booking-list-card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+            <h5 class="card-title mb-0 text-nowrap">
+                <i class="fas fa-list text-primary me-2"></i>All Bookings
+            </h5>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Search -->
+                <div class="input-group input-group-xl search-input-group">
+                    <span class="input-group-text ps-3">
+                        <i class="fas fa-search" style="color: #64748b;"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control shadow-none" placeholder="Search...">
+                </div>
+
+                <!-- Date Range -->
+                <div class="d-flex align-items-center gap-1">
+                    <input type="date" id="fromDate" class="form-control form-control-sm" title="From Date">
+                    <span class="text-muted">-</span>
+                    <input type="date" id="toDate" class="form-control form-control-sm" title="To Date">
+                </div>
+
+                <!-- Buyer Filter -->
+                <select id="tableBuyerFilter" class="form-select form-select-sm d-inline-block w-auto no-arrow">
+                    <option value="all">All Buyers</option>
+                </select>
+
+                <!-- Actions -->
+                <button id="filterBtn" class="btn btn-primary btn-sm" title="Filter Dates">
+                    <i class="fas fa-filter me-2"></i>Filter
+                </button>
+
+                <button id="clearSearchBtn" class="btn btn-outline-secondary btn-sm" title="Clear Search & Filters">
+                    <i class="fas fa-times me-1"></i>Clear
+                </button>
+
+                <div class="vr mx-1"></div>
+
+                <button class="btn btn-success btn-sm" onclick="exportExcel()" title="Export Excel">
+                    <i class="fas fa-file-excel me-2"></i>Export
+                </button>
+
+                <button class="btn btn-info btn-sm text-white" onclick="printFiltered()" title="Print">
+                    <i class="fas fa-print me-2"></i>Print
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th><i class="fas fa-hashtag me-1"></i>Booking No</th>
+                            <th><i class="fas fa-user-tie me-1"></i>Customer</th>
+                            <th><i class="fas fa-shopping-cart me-1"></i>Buyer</th>
+                            <th><i class="fas fa-box me-1"></i>Item</th>
+                            <th><i class="fas fa-calendar me-1"></i>Booking Date</th>
+                            <th><i class="fas fa-clipboard-check me-1"></i>Check Status</th>
+                            <th><i class="fas fa-calendar-check me-1"></i>Check Date</th>
+                            <th><i class="fas fa-sticky-note me-1"></i>Remarks</th>
+                            <th class="text-center"><i class="fas fa-cog me-1"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTable">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block text-muted opacity-50"></i>
+                                <p class="mb-0">No bookings added yet</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="pagination" class="mt-3 text-center"></div>
+        </div>
+
+        <!-- Simple Footer -->
+        <footer class="booking-footer">
+            <p style="margin: 0;">&copy; 2026 Zahid hasan MIS-13. All rights reserved.</p>
+        </footer>
+
+    </div> <!-- End container-fluid -->
+</div>

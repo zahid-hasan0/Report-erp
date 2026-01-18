@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="assets/css/emb-entry.css">
+
+<div id="emb-report-module" class="py-4">
+    <div class="container-main px-4">
+        <!-- Entry Section -->
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="panel-card animate">
+                    <div class="panel-header" data-bs-toggle="collapse" data-bs-target="#entryCollapse">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            <span>NEW JOB ENTRY</span>
+                        </div>
+                        <i class="fas fa-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="entryCollapse">
+                        <div class="panel-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted small">JOB NUMBERS</label>
+                                <textarea id="jobNumbers" class="form-control" rows="5"
+                                    placeholder="Enter job numbers...&#10;GMSC-25-08926&#10;GMSC-25-08927"></textarea>
+                                <div class="form-text mt-2 small">Comma or New Line separated</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary fw-bold py-2" id="addBtn">
+                                    <i class="fas fa-plus me-2"></i>Add to Drafts
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm border-0" id="deleteAllBtn">
+                                    <i class="fas fa-trash me-2"></i>Clear All Drafts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <!-- Draft List Section -->
+                <div class="panel-card animate">
+                    <div class="panel-header d-flex align-items-center justify-content-between flex-nowrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-list-ul me-2"></i>
+                            <span>DRAFT LIST</span>
+                            <span id="draftCountBadge" class="badge bg-white text-primary rounded-pill">0</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="form-check form-switch mb-0 d-flex align-items-center gap-2 me-3">
+                                <input class="form-check-input" type="checkbox" id="checkAll">
+                                <label class="form-check-label text-white small fw-bold" for="checkAll">SELECT
+                                    ALL</label>
+                            </div>
+                            <button class="btn btn-warning btn-sm fw-bold text-dark px-3" id="submitSelected">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Submit
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="toolbar d-flex gap-2 py-2 px-3 bg-light border-bottom">
+                        <button class="btn btn-sm btn-outline-primary fw-bold" id="copyDraftsBtn">
+                            <i class="fas fa-copy me-1"></i> Copy
+                        </button>
+                        <button class="btn btn-sm btn-success fw-bold" id="whatsappSelectedBtn">
+                            <i class="fab fa-whatsapp me-1"></i> Send Selected
+                        </button>
+                        <button class="btn btn-sm btn-primary fw-bold" id="whatsappFullBtn">
+                            <i class="fab fa-whatsapp me-1"></i> Full Report
+                        </button>
+                    </div>
+
+                    <div class="panel-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-gms table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"></th>
+                                        <th style="width: 50px;">SL</th>
+                                        <th style="width: 130px;">JOB NO</th>
+                                        <th style="width: 150px;">BUYER</th>
+                                        <th style="width: 130px;">WO #</th>
+                                        <th style="width: 120px;">STATUS</th>
+                                        <th style="min-width: 200px;">COMMENTS</th>
+                                        <th class="text-end" style="width: 140px;">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="draftTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

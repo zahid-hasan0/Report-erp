@@ -1,0 +1,798 @@
+<!-- pages/settings.html -->
+<style>
+    /* Professional ERP Settings Layout */
+    .pro-settings-layout {
+        display: flex;
+        height: 100%;
+        background-color: #f8fafc;
+        /* Slate-50 */
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* 1. Dark Sidebar */
+    .pro-settings-sidebar {
+        width: 280px;
+        min-width: 280px;
+        background: #0f172a;
+        /* Slate-900 */
+        color: #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem 1rem;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+        z-index: 10;
+    }
+
+    .sidebar-header {
+        padding: 0 1rem 2rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .sidebar-header h4 {
+        color: white;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+
+    .nav-group-title {
+        text-transform: uppercase;
+        font-size: 0.70rem;
+        font-weight: 700;
+        color: #64748b;
+        /* Slate-500 */
+        letter-spacing: 1px;
+        margin-bottom: 0.75rem;
+        padding-left: 1rem;
+    }
+
+    .pro-nav-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.25rem;
+        color: #cbd5e1;
+        /* Slate-300 */
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+    }
+
+    .pro-nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+    }
+
+    .pro-nav-item.active {
+        background: #2563eb;
+        /* Blue-600 */
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .pro-nav-item i {
+        width: 24px;
+        margin-right: 12px;
+        font-size: 1.1rem;
+        opacity: 0.8;
+    }
+
+    /* 2. Content Area */
+    .pro-settings-content {
+        flex: 1;
+        padding: 2.5rem;
+        overflow-y: auto;
+    }
+
+    .settings-header {
+        margin-bottom: 2rem;
+    }
+
+    .settings-header h2 {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .pro-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border: 1px solid #f1f5f9;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .pro-card-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+    }
+
+    .pro-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .pro-card-body {
+        padding: 2rem;
+    }
+
+    /* Form Elements Override */
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-color: #cbd5e1;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* Table Styles */
+    .pro-table thead th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pro-table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        font-size: 0.95rem;
+    }
+
+    .avatar-initial {
+        width: 36px;
+        height: 36px;
+        background-color: #eff6ff;
+        color: #2563eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        margin-right: 12px;
+    }
+
+    /* User Grid Layout */
+    .user-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .user-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #cbd5e1;
+    }
+
+    .user-avatar-lg {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        background-color: #f1f5f9;
+        color: #334155;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 4px solid white;
+    }
+
+    .user-card h5 {
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .user-username {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        background: #f8fafc;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+    }
+
+    .user-role-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .role-admin {
+        background: #0f172a;
+        color: #fbbf24;
+        /* Amber-400 text for contrast */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .role-user {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+
+    .user-actions {
+        margin-top: auto;
+        width: 100%;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Terminal/Console Viewer */
+    .terminal-window {
+        background: #1e1e1e;
+        /* VS Code Dark */
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        border: 1px solid #333;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    .terminal-header {
+        background: #252526;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #333;
+    }
+
+    .terminal-dots {
+        display: flex;
+        gap: 6px;
+        margin-right: 16px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .dot-red {
+        background: #ff5f56;
+    }
+
+    .dot-yellow {
+        background: #ffbd2e;
+    }
+
+    .dot-green {
+        background: #27c93f;
+    }
+
+    .terminal-title {
+        color: #8b949e;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .terminal-body {
+        height: 600px;
+        overflow-y: auto;
+        padding: 1rem;
+        color: #d4d4d4;
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .log-line {
+        display: flex;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 2px 0;
+    }
+
+    .log-ts {
+        color: #569cd6;
+        min-width: 80px;
+        opacity: 0.7;
+    }
+
+    .log-content {
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    .log-content.warn {
+        color: #dcdcaa;
+    }
+
+    .log-content.error {
+        color: #f48771;
+    }
+
+    /* Scrollbar */
+    .terminal-body::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .terminal-body::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+
+    .terminal-body::-webkit-scrollbar-thumb {
+        background: #424242;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="pro-settings-layout">
+    <!-- Dark Sidebar -->
+    <div class="pro-settings-sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-cogs me-2"></i>Settings</h4>
+        </div>
+
+        <div class="nav-group-title">Administration</div>
+        <button class="pro-nav-item active settings-nav-item" data-tab="user-management">
+            <i class="fas fa-users-cog"></i> Users & Roles
+        </button>
+        <button class="pro-nav-item settings-nav-item" data-tab="general-settings">
+            <i class="fas fa-sliders-h"></i> Configuration
+        </button>
+        <button class="pro-nav-item settings-nav-item" data-tab="dashboard-settings">
+            <i class="fas fa-chart-pie"></i> Dashboard
+        </button>
+
+        <div class="nav-group-title mt-4">Integrations</div>
+        <button class="pro-nav-item settings-nav-item" data-tab="whatsapp-settings">
+            <i class="fab fa-whatsapp"></i> WhatsApp API
+        </button>
+
+        <div class="nav-group-title mt-4">Account</div>
+        <button class="pro-nav-item settings-nav-item" data-tab="profile-settings">
+            <i class="fas fa-user-circle"></i> My Profile
+        </button>
+
+        <div class="mt-auto pt-4 border-top border-secondary">
+            <button class="pro-nav-item settings-nav-item text-warning" data-tab="system-status">
+                <i class="fas fa-terminal"></i> System Logs
+            </button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="pro-settings-content">
+
+        <!-- User Management -->
+        <div id="user-management" class="settings-section">
+            <div class="settings-header">
+                <h2>User Management</h2>
+                <p class="text-muted">Manage system access and permissions for your team.</p>
+            </div>
+
+            <div class="d-flex justify-content-end mb-4">
+                <button class="btn btn-primary" onclick="loadUserList()"><i class="fas fa-sync me-2"></i>Sync
+                    List</button>
+            </div>
+
+            <div class="pro-card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table pro-table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">User Identity</th>
+                                <th>Role & Permissions</th>
+                                <th>Access Level</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userListContainer">
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="fas fa-spinner fa-spin me-2"></i> Loading users...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- General Settings -->
+        <div id="general-settings" class="settings-section d-none">
+            <div class="settings-header">
+                <h2>System Configuration</h2>
+                <p class="text-muted">Manage global announcements and system-wide settings.</p>
+            </div>
+
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title"><i class="fas fa-bullhorn text-primary"></i> Global Announcement</h5>
+                </div>
+                <div class="pro-card-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <label class="form-label">Announcement Text</label>
+                            <input type="text" id="marqueeTextInput" class="form-control"
+                                placeholder="Type an important message for all users...">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button class="btn btn-danger w-100" onclick="addNotice()"><i
+                                    class="fas fa-paper-plane me-2"></i>Publish</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title">Live Notices</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="loadNotices()">Refresh</button>
+                </div>
+                <div class="pro-card-body p-0">
+                    <div id="noticeListContainer" class="p-3" style="max-height: 300px; overflow-y: auto;">
+                        <div class="text-center text-muted py-4"><i class="fas fa-circle-notch fa-spin me-2"></i>
+                            Loading data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WhatsApp Settings -->
+        <div id="whatsapp-settings" class="settings-section d-none">
+            <div class="settings-header">
+                <h2>WhatsApp Integration</h2>
+                <p class="text-muted">Manage contact lists for automated reporting.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="pro-card h-100">
+                        <div class="pro-card-header">
+                            <h5 class="pro-card-title">Job Contacts</h5>
+                            <button class="btn btn-sm btn-light border" onclick="addWhatsAppContact('individual')"><i
+                                    class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table pro-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Name</th>
+                                        <th class="text-end pe-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="waIndividualBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pro-card h-100">
+                        <div class="pro-card-header">
+                            <h5 class="pro-card-title">Report Contacts</h5>
+                            <button class="btn btn-sm btn-light border" onclick="addWhatsAppContact('full_report')"><i
+                                    class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table pro-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Name</th>
+                                        <th class="text-end pe-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="waFullBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Settings -->
+        <div id="dashboard-settings" class="settings-section d-none">
+            <div class="settings-header">
+                <h2>Dashboard Controls</h2>
+                <p class="text-muted">Configure the default view for the main dashboard.</p>
+            </div>
+
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title">Active Period Configuration</h5>
+                </div>
+                <div class="pro-card-body">
+                    <div class="row g-4">
+                        <div class="col-md-5">
+                            <label class="form-label">Show Month</label>
+                            <select id="activeMonthSelect" class="form-select">
+                                <option value="all">Every Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Show Year</label>
+                            <select id="activeYearSelect" class="form-select">
+                                <option value="all">Every Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="saveActiveView()">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title">Fiscal Years Management</h5>
+                    <button class="btn btn-sm btn-dark" onclick="addNewYear()">Add New Year</button>
+                </div>
+                <div class="pro-card-body">
+                    <div id="yearListContainer" class="d-flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile -->
+        <div id="profile-settings" class="settings-section d-none">
+            <div class="settings-header">
+                <h2>Account Profile</h2>
+            </div>
+            <div class="pro-card">
+                <div class="pro-card-body">
+                    <p>Logged in as: <strong id="currentUsernameDisp"></strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div id="system-status" class="settings-section d-none">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="mb-1 text-dark">System Logs & Diagnostics</h2>
+                    <p class="text-muted mb-0">Real-time log capture. Hidden from browser console.</p>
+                </div>
+                <div>
+                    <button class="btn btn-warning" onclick="clearSystemLogs()"><i
+                            class="fas fa-trash-alt me-2"></i>Clear</button>
+                    <button class="btn btn-dark" onclick="refreshSystemLogs()"><i class="fas fa-sync me-2"></i>Poll
+                        Logs</button>
+                </div>
+            </div>
+
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="terminal-title">admin@booking-system:~ (monitoring)</div>
+                </div>
+                <div id="consoleLogViewer" class="terminal-body">
+                    <div class="text-muted opacity-50 text-center mt-5">Initializing Status Monitor...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Unified Modal (Kept same logic structure) -->
+<div class="modal fade" id="userManagementModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h6 class="modal-title fw-bold" id="manageModalTitle">Manage User</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 pt-2">
+                <input type="hidden" id="manageUsernameHidden">
+                <ul class="nav nav-tabs nav-fill mb-4" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active small fw-bold text-uppercase" data-bs-toggle="tab"
+                            data-bs-target="#tab-manage" type="button">Profile</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link small fw-bold text-uppercase" data-bs-toggle="tab"
+                            data-bs-target="#tab-privilege" type="button">Permissions</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-manage">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold mb-1">Role</label>
+                            <select class="form-select" id="manageRoleSelect">
+                                <option value="user">User</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold mb-1">Default Landing Page</label>
+                            <select class="form-select" id="manageDefaultPage">
+                                <option value="dashboardPage">Dashboard (Standard)</option>
+                                <option value="bookingPage">Bookings</option>
+                                <option value="buyerManagementPage">Buyer Library</option>
+                                <option value="reportPage">Reports Analysis</option>
+                                <option value="embEntryPage">Emb Entry</option>
+                                <option value="embReportPage">Emb Reports</option>
+                                <option value="buyerNotesPage">Buyer Notes</option>
+                                <option value="merchandisingPage">Packing List</option>
+                                <option value="merchandisingBuyersPage">Manage Buyers</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold mb-1">Password Check</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="managePasswordInput"
+                                    placeholder="New Password">
+                                <button class="btn btn-outline-secondary" onclick="generateRandomPass()">Gen</button>
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-danger fw-bold mb-0">Delete Account</h6>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser()">Confirm</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab-privilege">
+                        <div class="d-flex flex-column gap-2">
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Dashboard Access</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="dashboardPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Bookings Module</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="bookingPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Buyer Library</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="buyerManagementPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Reports Analysis</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="reportPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Embellishment Entry</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="embEntryPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Embellishment Reports</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="embReportPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Buyer Notes</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="buyerNotesPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Packing List</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="merchandisingPage"></div>
+                            </div>
+                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                                <span class="perm-label">Manage Buyers (Merch)</span>
+                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
+                                        type="checkbox" value="merchandisingBuyersPage"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-2 bg-light">
+                <button type="button" class="btn btn-sm btn-white border" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-dark px-3" onclick="saveUserManagement()">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add WhatsApp Contact Modal -->
+<div class="modal fade" id="addContactModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h6 class="modal-title fw-bold">Add WhatsApp Contact</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="addContactTypeHidden">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold mb-1">Contact Name</label>
+                    <input type="text" class="form-control" id="addContactName" placeholder="e.g. John Doe">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold mb-1">Phone Number</label>
+                    <input type="text" class="form-control" id="addContactNumber" placeholder="e.g. 01712345678">
+                </div>
+            </div>
+            <div class="modal-footer py-2 bg-light">
+                <button type="button" class="btn btn-sm btn-white border" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-sm btn-dark px-3" onclick="saveNewContact()">Add Contact</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display:none">
+</div>
+</div>
+</div>
+</div>

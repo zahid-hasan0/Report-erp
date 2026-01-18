@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="assets/css/merchandising.css">
+
+<div class="container-fluid p-4">
+    <div class="settings-header mb-4">
+        <h2>Manage Merchandising Buyers</h2>
+        <p class="text-muted">Add, edit, or remove buyers for the Packing List system.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title"><i class="fas fa-plus-circle text-primary"></i> Add New Buyer</h5>
+                </div>
+                <div class="pro-card-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="newBuyerName"
+                            placeholder="Enter buyer name (e.g. Nike, Adidas)">
+                        <button class="btn btn-primary px-4" onclick="addMerchBuyer()">
+                            <i class="fas fa-plus me-2"></i>Add Buyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title"><i class="fas fa-list text-primary"></i> Existing Buyers</h5>
+                </div>
+                <div class="pro-card-body p-0">
+                    <div id="buyerList" class="p-3" style="max-height: 500px; overflow-y: auto;">
+                        <!-- Buyer items will be injected here -->
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-spinner fa-spin me-2"></i> Loading buyers...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Buyer Modal (Re-used) -->
+    <div class="modal fade" id="editBuyerModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">Edit Buyer Name</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" id="editBuyerOldName">
+                    <div class="form-group">
+                        <label class="form-label fw-bold">New Buyer Name</label>
+                        <input type="text" class="form-control form-control-lg" id="editBuyerName">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="saveMerchBuyerEdit()">Save
+                        Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

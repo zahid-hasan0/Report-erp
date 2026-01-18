@@ -1,0 +1,147 @@
+/* reports.css */
+
+#emailReportSection .card {
+    border: 1px solid #004fec;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 10px 20px rgba(0, 0, 0, 0.02);
+}
+
+#emailReportSection .card-header {
+    background: linear-gradient(to right, #ffffff, #ffffff);
+    border: none;
+    padding: 28px 36px;
+}
+
+#emailReportSection .icon-wrapper {
+    background: rgba(255, 255, 255, 0.1);
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#emailReportSection .icon-wrapper i {
+    font-size: 26px;
+    color: #050505;
+}
+
+#emailReportSection .card-title {
+    color: #000000;
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: -0.3px;
+    margin-bottom: 0.25rem;
+}
+
+#emailReportSection .card-subtitle {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 13px;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+#emailReportSection .btn-configure {
+    background: rgba(41, 19, 241, 0.15);
+    color: #000000;
+    border: 1px solid rgb(24, 4, 95);
+    border-radius: 6px;
+    padding: 9px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+#emailReportSection .btn-configure i {
+    font-size: 12px;
+}
+
+#emailReportSection .card-body {
+    background: #fafbfc;
+    padding: 36px;
+}
+
+#emailReportSection .config-box,
+#emailReportSection .recipient-box {
+    background: #dbe0e0;
+    border: 1px solid #20345a;
+    border-radius: 10px;
+    padding: 28px;
+    margin-bottom: 24px;
+}
+
+#emailReportSection .recipient-box {
+    border-color: #1242a1;
+}
+
+#emailReportSection .section-indicator {
+    width: 4px;
+    height: 20px;
+    background: #1e293b;
+    border-radius: 2px;
+}
+
+#emailReportSection .section-title {
+    color: #1e293b;
+    font-weight: 600;
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: -0.2px;
+}
+
+#emailReportSection .form-label {
+    font-weight: 600;
+    color: #000000;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+}
+
+#emailReportSection .form-select,
+#emailReportSection .form-control {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 11px 14px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #1f2937;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+#emailReportSection .btn-send {
+    background: #1e293b;
+    border: none;
+    border-radius: 6px;
+    padding: 13px 36px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    min-width: 180px;
+    letter-spacing: 0.3px;
+}
+
+#emailReportSection .btn-download {
+    border-radius: 6px;
+    padding: 13px 36px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    min-width: 180px;
+    letter-spacing: 0.3px;
+}
+
+#uploadAccordion {
+    border: 2px solid rgba(0, 0, 0, 0.219);
+}
+
+#uploadAccordion .accordion-button {
+    font-weight: bold;
+}

@@ -1,0 +1,66 @@
+/* booking.css */
+
+#bookingAccordion {
+    border: 2px solid rgba(0, 0, 0, 0.219);
+}
+
+#bookingAccordion .accordion-button {
+    font-weight: bold;
+}
+
+#buyerDropdownBtn {
+    border: 1px solid #7c7f81a4;
+    background: white;
+    color: #495057;
+}
+
+.custom-search-dropdown .dropdown-menu {
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.custom-search-dropdown #buyerOptionsList {
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.card[style*="margin: 10px 15px"] {
+    margin: 10px 15px;
+    padding: 10px;
+}
+
+.search-input-group {
+    width: 250px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid #443f3f;
+}
+
+.search-input-group .input-group-text {
+    background: white;
+    border: 0;
+}
+
+.search-input-group .form-control {
+    border: 0;
+    box-shadow: none;
+    background: white;
+    font-size: 14px;
+    color: #050505;
+}
+
+#fromDate,
+#toDate {
+    border: 1px solid #adb5bd;
+    width: 130px;
+}
+
+.booking-footer {
+    background-color: #ffffff;
+    margin-top: 20px;
+    color: #000000;
+    text-align: center;
+    padding: 20px 0;
+    font-family: sans-serif;
+}
