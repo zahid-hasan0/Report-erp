@@ -106,6 +106,12 @@ function renderItems(itemsToRender) {
             <td><span class="badge bg-light text-dark border">${item.logicCode || '-'}</span></td>
             <td>${item.logicDescription || '-'}</td>
             <td>${item.comments || '-'}</td>
+            <td>
+                <div class="d-flex flex-column" style="line-height: 1.2;">
+                    <span class="text-muted" style="font-size: 0.75rem;">${item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</span>
+                    <span class="fw-bold text-dark" style="font-size: 0.8rem;">${item.creatorName || (item.createdBy === 'admin' ? 'Admin' : 'Admin')}</span>
+                </div>
+            </td>
             <td class="text-center">
                 <div class="d-flex gap-1 justify-content-center">
                     <button class="btn btn-sm btn-outline-primary" onclick="editItemNote('${item.id}')"><i class="fas fa-edit"></i></button>
@@ -133,7 +139,7 @@ function filterItems() {
 
 function showEntryPage(itemId) {
     const ui = getUI();
-    ui.entryPage.style.display = 'block';
+    ui.entryPage.classList.add('active'); // Use class for flex centering
 
     if (itemId) {
         const item = items.find(i => i.id === itemId);
@@ -154,7 +160,7 @@ function showEntryPage(itemId) {
 }
 
 function closeEntryPage() {
-    getUI().entryPage.style.display = 'none';
+    getUI().entryPage.classList.remove('active');
     resetForm();
 }
 
@@ -174,6 +180,7 @@ function resetForm() {
 
 async function saveItem() {
     const ui = getUI();
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const buyerName = ui.buyerName.value.trim();
     if (!buyerName) return showToast('Buyer Name is required!', 'error');
 
@@ -183,8 +190,14 @@ async function saveItem() {
         tpcLogic: ui.tpcLogic.value.trim(),
         logicCode: ui.logicCode.value.trim(),
         logicDescription: ui.logicDescription.value.trim(),
+        logicCode: ui.logicCode.value.trim(),
+        logicDescription: ui.logicDescription.value.trim(),
         comments: ui.comments.value.trim(),
-        timestamp: serverTimestamp()
+        createdAt: new Date().toISOString(), // Standardized for Notifications.
+        timestamp: serverTimestamp(), // Keep for sorting
+        // User Tracking
+        createdBy: currentUser.username || 'unknown',
+        creatorName: currentUser.role === 'admin' ? 'Zahid' : (currentUser.fullName || 'Admin')
     };
 
     try {

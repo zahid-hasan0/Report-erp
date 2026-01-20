@@ -163,22 +163,29 @@ export async function editBooking(id) {
         return;
     }
 
-    // 1. Switch to the booking page first
-    await window.showPage('bookingPage');
+    // 1. Switch to the booking page using optimized function
+    const wasAlreadyActive = await window.showPageOptimized('bookingPage');
 
-    // 2. Wait a tiny bit for the DOM to be fully ready after injection
-    setTimeout(() => {
+    const populateForm = () => {
         try {
             const editIdEl = document.getElementById('editId');
             if (!editIdEl) {
-                console.error("❌ Edit form elements not found after page load");
+                console.error("❌ Edit form elements not found");
                 return;
             }
 
             editIdEl.value = booking.id;
             document.getElementById('bookingNo').value = booking.bookingNo || '';
             document.getElementById('customer').value = booking.customer || '';
-            document.getElementById('buyer').value = booking.buyer || '';
+
+            // Set Hidden Input
+            const buyerInput = document.getElementById('buyer');
+            if (buyerInput) buyerInput.value = booking.buyer || '';
+
+            // Set UI Label for Custom Dropdown
+            const buyerLabel = document.getElementById('selectedBuyerLabel');
+            if (buyerLabel) buyerLabel.textContent = booking.buyer || '-- Select Buyer --';
+
             document.getElementById('item').value = booking.item || '';
             document.getElementById('bookingDate').value = booking.bookingDate || '';
             document.getElementById('checkStatus').value = booking.checkStatus || 'Unverified';
@@ -190,7 +197,14 @@ export async function editBooking(id) {
         } catch (err) {
             console.error("Error populating form:", err);
         }
-    }, 100);
+    };
+
+    if (wasAlreadyActive) {
+        populateForm();
+    } else {
+        // Wait for potential content injection
+        setTimeout(populateForm, 150);
+    }
 }
 
 window.editBooking = editBooking;

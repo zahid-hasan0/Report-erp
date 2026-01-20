@@ -1,5 +1,5 @@
 // excel.js
-import { db } from './storage.js';
+import { getActiveDb, getBookingsPath } from './storage.js';
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { loadBookings } from './display.js';
 import { showToast } from './toast.js';
@@ -88,6 +88,11 @@ export async function importExcel() {
         return;
     }
 
+    if (typeof XLSX === 'undefined') {
+        showToast('Excel library not loaded. Please refresh the page.', 'error');
+        return;
+    }
+
     showSpinner();
 
     const reader = new FileReader();
@@ -104,24 +109,34 @@ export async function importExcel() {
                 return;
             }
 
-            let imported = 0, skipped = 0;
-            for (const [index, row] of jsonData.entries()) {
-                const bookingNo = String(row['BOOKING NO'] || '').trim();
-                const customer = String(row['CUSTOMER'] || '').trim();
-                const buyer = String(row['BUYER'] || '').trim();
-                const item = String(row['ITEM'] || '').trim();
-                const remarks = String(row['Remarks'] || '').trim();
-                const checkStatus = String(row['Check Status'] || 'Unverified').trim();
-                const bookingDate = formatDateForFirestore(row['Date']);
+            const activeDb = getActiveDb();
+            const bookingsPath = getBookingsPath();
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-                // Check Date is optional
+            console.log(`🚀 Starting import of ${jsonData.length} rows to ${bookingsPath}`);
+
+            let imported = 0, skipped = 0;
+            for (const row of jsonData) {
+                // Flexible mapping for headers
+                const bookingNo = String(row['Booking No'] || row['BOOKING NO'] || '').trim();
+                const customer = String(row['Customer'] || row['CUSTOMER'] || '').trim();
+                const buyer = String(row['Buyer'] || row['BUYER'] || '').trim();
+                const item = String(row['Item'] || row['ITEM'] || '').trim();
+                const remarks = String(row['Remarks'] || row['REMARKS'] || '').trim();
+                const checkStatus = String(row['Status'] || row['Check Status'] || 'Unverified').trim();
+
+                // Flexible date mapping
+                const rawDate = row['Date'] || row['DATE'] || row['Booking Date'];
+                const bookingDate = rawDate ? formatDateForFirestore(rawDate) : formatDateForFirestore(new Date());
+
+                const rawCheckDate = row['Check Date'] || row['CHECK DATE'];
                 let checkDate = '';
-                if (row['Check Date']) {
-                    checkDate = formatDateForFirestore(row['Check Date']);
+                if (rawCheckDate) {
+                    checkDate = formatDateForFirestore(rawCheckDate);
                 }
 
                 if (bookingNo && customer) {
-                    await addDoc(collection(db, 'bookings'), {
+                    await addDoc(collection(activeDb, bookingsPath), {
                         bookingNo,
                         customer,
                         buyer,
@@ -129,7 +144,12 @@ export async function importExcel() {
                         bookingDate,
                         checkStatus,
                         checkDate,
-                        remarks
+                        remarks,
+                        // Add audit info for consistency with manual entry
+                        createdBy: user.username || 'System',
+                        creatorName: user.fullName || user.username || 'System Import',
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
                     });
                     imported++;
                 } else {
@@ -137,21 +157,22 @@ export async function importExcel() {
                 }
             }
 
+            console.log(`✅ Import finished: ${imported} added, ${skipped} skipped.`);
             await loadBookings();
             hideSpinner();
 
             if (imported > 0) {
-                showToast(`Successfully imported ${imported} booking${imported > 1 ? 's' : ''}!${skipped > 0 ? ` (Skipped ${skipped})` : ''}`, 'success');
+                showToast(`Successfully imported ${imported} bookings!`, 'success');
             } else {
-                showToast('No valid bookings found to import', 'error');
+                showToast('No valid bookings found in the file. Check Booking No and Customer columns.', 'error');
             }
 
             document.getElementById('excelFile').value = '';
 
         } catch (err) {
-            console.error("Error importing Excel:", err);
+            console.error("🔥 Error importing Excel:", err);
             hideSpinner();
-            showToast(`Error importing Excel: ${err.message}`, 'error');
+            showToast(`Error: ${err.message}`, 'error');
         }
     };
 
@@ -170,14 +191,24 @@ function downloadTemplate() {
     try {
         const template = [
             {
-                "BOOKING NO": "BK001",
-                "CUSTOMER": "Sample Customer",
-                "BUYER": "Sample Buyer",
-                "ITEM": "Sample Item",
+                "Booking No": "BK-2024-001",
+                "Customer": "GMS Composite",
+                "Buyer": "H&M",
+                "Item": "T-Shirt 100% Cotton",
                 "Date": new Date().toISOString().split('T')[0],
-                "Check Status": "Unverified",
+                "Status": "Unverified",
+                "Check Date": "",
+                "Remarks": "Sample internal note"
+            },
+            {
+                "Booking No": "BK-2024-002",
+                "Customer": "GMS Textile",
+                "Buyer": "Zara",
+                "Item": "Polo Shirt",
+                "Date": new Date().toISOString().split('T')[0],
+                "Status": "Verified",
                 "Check Date": new Date().toISOString().split('T')[0],
-                "Remarks": "Sample remarks"
+                "Remarks": ""
             }
         ];
 
@@ -187,18 +218,18 @@ function downloadTemplate() {
 
         // Set column widths
         ws['!cols'] = [
-            { wch: 15 },
-            { wch: 25 },
-            { wch: 25 },
-            { wch: 20 },
-            { wch: 12 },
-            { wch: 15 },
-            { wch: 12 },
-            { wch: 30 }
+            { wch: 20 }, // Booking No
+            { wch: 25 }, // Customer
+            { wch: 20 }, // Buyer
+            { wch: 25 }, // Item
+            { wch: 15 }, // Date
+            { wch: 15 }, // Status
+            { wch: 15 }, // Check Date
+            { wch: 30 }  // Remarks
         ];
 
-        XLSX.utils.book_append_sheet(wb, ws, "Template");
-        XLSX.writeFile(wb, "Booking_Template.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Booking Template");
+        XLSX.writeFile(wb, "Booking_Import_Template.xlsx");
 
         showToast('Template downloaded successfully!', 'success');
     } catch (err) {

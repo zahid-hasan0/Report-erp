@@ -290,32 +290,41 @@ export async function loadUserProfile() {
         const dropdownRole = document.getElementById('dropdownUserRole');
         if (dropdownRole) dropdownRole.textContent = roleText;
 
+        // Populate Profile Page Role if exists
+        const profilePageRole = document.getElementById('profilePageRole');
+        if (profilePageRole) profilePageRole.value = roleText;
+
+        // Default Data
+        let finalName = currentUser.fullName || currentUser.username;
+        let finalImage = './gms icon.png';
+
         if (profileSnap.exists()) {
             const profileData = profileSnap.data();
-
-            // Update sidebar
-            if (profileData.name) {
-                document.getElementById('sidebarUserName').textContent = profileData.name;
-                const dropdownName = document.getElementById('dropdownProfileName');
-                if (dropdownName) dropdownName.textContent = profileData.name;
-            }
-
-            if (profileData.image) {
-                const sidebarImage = document.getElementById('sidebarProfileImage');
-                if (sidebarImage) {
-                    sidebarImage.src = profileData.image;
-                }
-                const dropdownImage = document.getElementById('dropdownProfileImage');
-                if (dropdownImage) {
-                    dropdownImage.src = profileData.image;
-                }
-            }
-        } else {
-            // Set default name from currentUser
-            document.getElementById('sidebarUserName').textContent = currentUser.fullName || currentUser.username;
-            const dropdownName = document.getElementById('dropdownProfileName');
-            if (dropdownName) dropdownName.textContent = currentUser.fullName || currentUser.username;
+            if (profileData.name) finalName = profileData.name;
+            if (profileData.image) finalImage = profileData.image;
         }
+
+        // Update UI Elements
+        // 1. Sidebar & Header
+        const sidebarName = document.getElementById('sidebarUserName');
+        if (sidebarName) sidebarName.textContent = finalName;
+
+        const dropdownName = document.getElementById('dropdownProfileName');
+        if (dropdownName) dropdownName.textContent = finalName;
+
+        const sidebarImage = document.getElementById('sidebarProfileImage');
+        if (sidebarImage) sidebarImage.src = finalImage;
+
+        const dropdownImage = document.getElementById('dropdownProfileImage');
+        if (dropdownImage) dropdownImage.src = finalImage;
+
+        // 2. Profile Page Inputs (if on profile page)
+        const profilePageName = document.getElementById('profilePageName');
+        if (profilePageName) profilePageName.value = finalName;
+
+        const profilePageImg = document.getElementById('profilePageImage');
+        if (profilePageImg) profilePageImg.src = finalImage;
+
     } catch (error) {
         console.error('Error loading user profile:', error);
     }

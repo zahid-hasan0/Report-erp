@@ -4,16 +4,22 @@ import { loadBuyers } from './buyerManager.js';
 import { updateDashboard } from './summary.js';
 import { initSettings } from './adminSettings.js';
 import { getSystemSettings } from './systemSettings.js';
+import { initReportGenerator } from './reportGenerator.js';
+import { canAccessPage } from './auth.js'; // Import Single Source of Truth
+
+// ------------------------------------
+// Access Logic now handled in auth.js
+// ------------------------------------
+// ------------------------------------
 
 // Cache for page content
 const pageCache = {};
 
 export async function showPage(pageId) {
     // 0. Security Check
-    // (Ensure canAccessPage exists or is imported if used here, or handled globally)
-    // For now, assuming Global Auth Guard handles redirects, but let's keep the check if canAccessPage is defined
-    if (typeof canAccessPage === 'function' && !canAccessPage(pageId)) {
+    if (!canAccessPage(pageId)) {
         console.warn(`⛔ Access denied to ${pageId}`);
+        // Optionally show a "Access Denied" toast or just return
         return;
     }
 
@@ -29,7 +35,8 @@ export async function showPage(pageId) {
         'merchandisingPage': 'nav-merchandising',
         'merchandisingBuyersPage': 'nav-merchandising-buyers',
         'myTasksPage': 'nav-my-tasks',
-        'myDiaryPage': 'nav-my-diary'
+        'myDiaryPage': 'nav-my-diary',
+        'profilePage': 'nav-profile'
     };
 
     const titleMap = {
@@ -44,7 +51,8 @@ export async function showPage(pageId) {
         'merchandisingPage': 'Packing List',
         'merchandisingBuyersPage': 'Manage Buyers',
         'myTasksPage': 'My Task Planner',
-        'myDiaryPage': 'Personal Diary'
+        'myDiaryPage': 'Personal Diary',
+        'profilePage': 'Profile Management'
     };
 
     // 1. Update Sidebar Active State
@@ -78,23 +86,22 @@ export async function showPage(pageId) {
         'merchandisingPage': 'pages/merchandising.html',
         'merchandisingBuyersPage': 'pages/merchandising-buyers.html',
         'myTasksPage': 'pages/my-tasks.html',
-        'myDiaryPage': 'pages/my-diary.html'
+        'myDiaryPage': 'pages/my-diary.html',
+        'profilePage': 'pages/profile.html'
     };
 
     let filePath = fileMap[pageId];
 
-    // Special Logic: If User has NO modules, show 'home.html' instead of Dashboard
-    if (pageId === 'dashboardPage') {
-        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const isAdmin = user.role === 'admin';
-        const hasModules = user.allowedModules && user.allowedModules.length > 0;
-
-        if (!isAdmin && !hasModules) {
-            filePath = 'pages/home.html';
-            // Also update title
-            if (pageTitle) pageTitle.innerText = "Welcome";
-        }
-    }
+    // Special Logic: If User has NO modules, show 'home.html' instead of Dashboard -> REMOVED (Open Access)
+    // if (pageId === 'dashboardPage') {
+    //     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    //     const isAdmin = user.role === 'admin';
+    //     const hasModules = user.allowedModules && user.allowedModules.length > 0;
+    //
+    //     if (!isAdmin && !hasModules) {
+    //         filePath = 'pages/home.html';
+    //     }
+    // }
 
     if (!filePath) {
         console.error(`Page ID ${pageId} not found in fileMap.`);
@@ -115,7 +122,7 @@ export async function showPage(pageId) {
         appContent.innerHTML = content;
 
         // 4. Initialize Page Scripts
-        await initPageScripts(pageId);
+        await initPageScripts(pageId, false); // False means not a skip-reinjection call
 
     } catch (error) {
         console.error('Error loading page:', error);
@@ -123,23 +130,57 @@ export async function showPage(pageId) {
     }
 }
 window.showPage = showPage;
+window.canAccessPage = canAccessPage; // Expose globally just in case
 
-async function initPageScripts(pageId) {
-    console.log(`🚀 Initializing script for: ${pageId}`);
+// Optimized showPage for state-preserving navigation
+window.showPageOptimized = async function (pageId) {
+    const navMap = {
+        'dashboardPage': 'nav-dashboard',
+        'bookingPage': 'nav-booking',
+        'embEntryPage': 'nav-emb-entry',
+        'embReportPage': 'nav-emb-report',
+        'buyerNotesPage': 'nav-buyer-notes',
+        'buyerManagementPage': 'nav-buyers',
+        'reportPage': 'nav-reports',
+        'settingsPage': 'nav-settings',
+        'merchandisingPage': 'nav-merchandising',
+        'merchandisingBuyersPage': 'nav-merchandising-buyers',
+        'myTasksPage': 'nav-my-tasks',
+        'myDiaryPage': 'nav-my-diary',
+        'profilePage': 'nav-profile'
+    };
+
+    const activeNav = document.querySelector('.nav-link.active');
+    const isAlreadyOnPage = activeNav && activeNav.id === navMap[pageId];
+
+    if (isAlreadyOnPage && document.getElementById('app-content').innerHTML.trim() !== "") {
+        console.log(`ℹ️ Already on ${pageId}, skipping re-injection.`);
+        await initPageScripts(pageId, true); // True means skip resetForm
+        return true;
+    }
+
+    await showPage(pageId);
+    return false;
+};
+
+async function initPageScripts(pageId, skipReset = false) {
+    console.log(`🚀 Initializing script for: ${pageId} (skipReset: ${skipReset})`);
 
     if (pageId === 'dashboardPage') {
         if (window.bookings) await updateDashboard(window.bookings);
-        // Charts will be auto-updated by updateDashboard calling updateCharts
     }
     else if (pageId === 'bookingPage') {
         // Re-attach listeners for booking form
         if (window.setupBookingFormListeners) window.setupBookingFormListeners();
         if (window.setupTableListeners) window.setupTableListeners();
-        if (window.resetForm) window.resetForm();
 
-        // Reload data to ensure table is fresh
-        await loadBookings();
-        await loadBuyers(); // For dropdowns
+        if (!skipReset && window.resetForm) window.resetForm();
+
+        // Reload data to ensure table is fresh if not just preserving state
+        if (!skipReset) {
+            await loadBookings();
+            await loadBuyers();
+        }
     }
     else if (pageId === 'buyerManagementPage') {
         if (window.setupBuyerPageListeners) window.setupBuyerPageListeners();
@@ -147,6 +188,7 @@ async function initPageScripts(pageId) {
     }
     else if (pageId === 'reportPage') {
         if (window.setupReportListeners) window.setupReportListeners();
+        if (window.initReportGenerator) window.initReportGenerator();
 
         // Force update of report tables if data exists
         if (window.bookings && window.bookings.length > 0) {
@@ -167,6 +209,189 @@ async function initPageScripts(pageId) {
         const { initBuyerNotes } = await import('./buyerNotes_integrated.js');
         await initBuyerNotes();
     }
+    else if (pageId === 'profilePage') {
+        const { loadUserProfile } = await import('./profileManagement.js');
+        await loadUserProfile();
+
+        // 1. Image Preview Listener
+        const imgInput = document.getElementById('profilePageImageUpload');
+        if (imgInput) {
+            imgInput.onchange = function (e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (evt) {
+                        document.getElementById('profilePageImage').src = evt.target.result;
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            };
+        }
+
+        // 2. Save Handler
+        window.saveUserProfilePage = async function () {
+            const { db } = await import('./storage.js');
+            const { doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            const { showToast } = await import('./toast.js');
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const newName = document.getElementById('profilePageName').value.trim();
+            const imageInput = document.getElementById('profilePageImageUpload');
+
+            // Preferences
+            const prefUnverified = document.getElementById('prefUnverified')?.checked;
+            const prefSound = document.getElementById('prefSound')?.checked;
+
+            if (!newName) {
+                showToast('Please enter a name', 'error');
+                return;
+            }
+
+            try {
+                const saveBtn = document.getElementById('saveProfilePageBtn');
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+
+                // Determine Image Data (Default to current)
+                let imageData = document.getElementById('profilePageImage').src;
+
+                // Handle image upload if selected
+                if (imageInput.files && imageInput.files[0]) {
+                    const file = imageInput.files[0];
+
+                    // Client-side Resize Logic
+                    const resizeImage = (file, maxWidth = 300) => {
+                        return new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const img = new Image();
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    let width = img.width;
+                                    let height = img.height;
+                                    if (width > maxWidth) {
+                                        height *= maxWidth / width;
+                                        width = maxWidth;
+                                    }
+                                    canvas.width = width;
+                                    canvas.height = height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, width, height);
+                                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                                };
+                                img.src = e.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    };
+
+                    try {
+                        imageData = await resizeImage(file, 300);
+                    } catch (err) {
+                        console.error("Resize error", err);
+                        showToast("Error processing image", "error");
+                        saveBtn.disabled = false;
+                        return;
+                    }
+                }
+
+                // Update Firestore
+                const profileRef = doc(db, 'user_profiles', currentUser.username);
+                await setDoc(profileRef, {
+                    name: newName,
+                    image: imageData,
+                    preferences: {
+                        unverifiedAlerts: prefUnverified,
+                        soundEffects: prefSound
+                    },
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                // Update LocalStorage
+                currentUser.fullName = newName;
+                if (!currentUser.preferences) currentUser.preferences = {};
+                currentUser.preferences.unverifiedAlerts = prefUnverified;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                // Update UI Sidebar immediately
+                document.getElementById('sidebarUserName').textContent = newName;
+                const sidebarImg = document.getElementById('sidebarProfileImage');
+                if (sidebarImg) sidebarImg.src = imageData;
+
+                showToast('Profile saved successfully!', 'success');
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                let msg = 'Failed to save profile';
+                if (error.code === 'permission-denied') msg = 'Permission denied.';
+                if (error.message && error.message.includes('size')) msg = 'Image too large for database.';
+                showToast(msg, 'error');
+            } finally {
+                const saveBtn = document.getElementById('saveProfilePageBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save Changes';
+                }
+            }
+        };
+
+        // 3. Password Change Handler
+        window.changeUserPassword = async function () {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const currentPass = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmNewPassword').value;
+
+            const { db } = await import('./storage.js');
+            const { doc, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            const { showToast } = await import('./toast.js');
+
+            if (newPass !== confirmPass) {
+                showToast("New passwords do not match.", "error");
+                return;
+            }
+            if (newPass.length < 6) {
+                showToast("Password should be at least 6 characters.", "warning");
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('changePassBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+
+                // Verify Old Password
+                const userRef = doc(db, 'users', currentUser.username);
+                const snap = await getDoc(userRef);
+
+                if (snap.exists()) {
+                    const userData = snap.data();
+                    if (userData.password !== currentPass) {
+                        showToast("Incorrect current password.", "error");
+                        btn.disabled = false;
+                        btn.innerHTML = 'Update Password';
+                        return;
+                    }
+
+                    // Update Password
+                    await updateDoc(userRef, { password: newPass });
+                    showToast("Password updated successfully!", "success");
+
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmNewPassword').value = '';
+                }
+
+            } catch (e) {
+                console.error("Password update error:", e);
+                showToast("Failed to update password.", "error");
+            } finally {
+                const btn = document.getElementById('changePassBtn');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Update Password';
+                }
+            }
+        };
+    }
     else if (pageId === 'settingsPage') {
         await initSettings();
     }
@@ -186,190 +411,54 @@ async function initPageScripts(pageId) {
         const { initMyDiary } = await import('./myDiary.js');
         initMyDiary();
     }
+    else if (pageId === 'profilePage') {
+        console.log("👤 Initializing Profile Page...");
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        console.log("Current User Data:", currentUser);
+
+        // Populate Header with Login Username (as requested)
+        const nameDisplay = document.getElementById('profilePageNameDisplay');
+        if (nameDisplay) {
+            nameDisplay.textContent = '@' + (currentUser.username || 'User');
+            console.log("Set Header to:", nameDisplay.textContent);
+        } else {
+            console.error("❌ profilePageNameDisplay not found!");
+        }
+
+        // Populate Subtitle with Real Name
+        const usernameDisplay = document.getElementById('profilePageUsernameDisplay');
+        if (usernameDisplay) {
+            usernameDisplay.textContent = currentUser.fullName || 'No Name Set';
+            console.log("Set Subtitle to:", usernameDisplay.textContent);
+        }
+
+        // Populate Input
+        const nameInput = document.getElementById('profilePageName');
+        if (nameInput) nameInput.value = currentUser.fullName || currentUser.username || '';
+
+        // Populate Image
+        const img = document.getElementById('profilePageImage');
+        if (img && currentUser.image) img.src = currentUser.image;
+    }
 }
 
 
 // Clock Modal Logic (Preserved)
-window.openClockModal = function () {
-    const modal = document.getElementById('clockModal');
-    if (modal) {
-        modal.style.display = 'block';
-        updateBigClock();
-        if (!window.clockInterval) {
-            window.clockInterval = setInterval(updateBigClock, 1000);
-        }
+window.showClockModal = function () {
+    const modalEl = document.getElementById('clockModal');
+    if (!modalEl) return;
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+    updateClock();
+    if (!window.clockInterval) {
+        window.clockInterval = setInterval(updateClock, 1000);
     }
-}
+};
 
-document.querySelector('.close-clock')?.addEventListener('click', () => {
-    document.getElementById('clockModal').style.display = 'none';
-    clearInterval(window.clockInterval);
-    window.clockInterval = null;
-});
-
-// Close when clicking outside
-window.onclick = function (event) {
-    const modal = document.getElementById('clockModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-        clearInterval(window.clockInterval);
-        window.clockInterval = null;
-    }
-}
-
-function updateBigClock() {
+function updateClock() {
     const now = new Date();
-    const dateEl = document.getElementById('bigClockDate');
-    const timeEl = document.getElementById('bigClockTime');
-
-    if (dateEl) {
-        dateEl.textContent = now.toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-    }
-    if (timeEl) {
-        timeEl.textContent = now.toLocaleTimeString('en-US', {
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
-    }
-
-    const headerDate = document.getElementById('currentDate');
-    if (headerDate) {
-        headerDate.textContent = now.toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-    }
-}
-window.updateBigClock = updateBigClock;
-
-// Set current date
-const currentDateEl = document.getElementById('currentDate');
-if (currentDateEl) {
-    currentDateEl.textContent = new Date().toLocaleDateString('en-US', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
-}
-
-// ==========================================
-// ACCESS CONTROL & SIDEBAR LOGIC
-// ==========================================
-
-// 1. Check Page Access
-export function canAccessPage(pageId) {
-    const user = window.currentUserData || JSON.parse(localStorage.getItem('currentUser'));
-    if (!user) return false;
-
-    // Admin always has access
-    if (user.role === 'admin') return true;
-
-    // "Settings" is strictly for Admin, unless we allow "My Profile" for users later
-    if (pageId === 'settingsPage') return user.role === 'admin';
-
-    // "Home" or other general pages can be added here if needed
-
-    // Check specific permissions
-    const allowed = user.allowedModules || [];
-    return allowed.includes(pageId);
-}
-window.canAccessPage = canAccessPage; // Expose globally for showPage check
-
-// 2. Update Sidebar Visibility
-window.updateSidebarAccess = function (user) {
-    if (!user) return;
-
-    const settingsNav = document.getElementById('nav-settings');
-    const trimsDropdown = document.querySelector('[href="#trimsSubmenu"]');
-    const trimsMenu = document.getElementById('trimsSubmenu');
-    const embDropdown = document.querySelector('[href="#embSubmenu"]');
-    const embMenu = document.getElementById('embSubmenu');
-
-    // All data modules
-    const moduleIds = ['nav-dashboard', 'nav-booking', 'nav-emb-entry', 'nav-emb-report', 'nav-buyer-notes', 'nav-my-tasks', 'nav-my-diary', 'nav-buyers', 'nav-reports', 'nav-merchandising', 'nav-merchandising-buyers', 'nav-personal-dropdown'];
-
-    // Default: Hide all
-    moduleIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.setProperty('display', 'none', 'important');
-    });
-    if (settingsNav) settingsNav.style.setProperty('display', 'none', 'important');
-    if (trimsDropdown) trimsDropdown.style.setProperty('display', 'none', 'important');
-    if (embDropdown) embDropdown.style.setProperty('display', 'none', 'important');
-    const merchDropdown = document.getElementById('nav-merchandising-dropdown');
-    if (merchDropdown) merchDropdown.style.setProperty('display', 'none', 'important');
-
-    // Admin: Show Everything
-    if (user.role === 'admin') {
-        moduleIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.setProperty('display', 'flex', 'important');
-        });
-        if (settingsNav) settingsNav.style.setProperty('display', 'flex', 'important');
-        if (trimsDropdown) trimsDropdown.style.setProperty('display', 'flex', 'important');
-        if (embDropdown) embDropdown.style.setProperty('display', 'flex', 'important');
-        const merchDropdown = document.getElementById('nav-merchandising-dropdown');
-        if (merchDropdown) merchDropdown.style.setProperty('display', 'flex', 'important');
-
-        const personalDropdown = document.getElementById('nav-personal-dropdown');
-        if (personalDropdown) personalDropdown.style.setProperty('display', 'flex', 'important');
-        return;
-    }
-
-    // User: Show only allowed
-    const allowed = user.allowedModules || [];
-    const navMap = {
-        'dashboardPage': 'nav-dashboard',
-        'bookingPage': 'nav-booking',
-        'embEntryPage': 'nav-emb-entry',
-        'embReportPage': 'nav-emb-report',
-        'buyerNotesPage': 'nav-buyer-notes',
-        'buyerManagementPage': 'nav-buyers',
-        'reportPage': 'nav-reports',
-        'merchandisingPage': 'nav-merchandising',
-        'merchandisingBuyersPage': 'nav-merchandising-buyers'
-    };
-
-    let hasTrimsAccess = false;
-    let hasEmbAccess = false;
-    allowed.forEach(pageId => {
-        const navId = navMap[pageId];
-        if (navId) {
-            const el = document.getElementById(navId);
-            if (el) el.style.setProperty('display', 'flex', 'important');
-            if (['bookingPage', 'buyerManagementPage', 'reportPage'].includes(pageId)) {
-                hasTrimsAccess = true;
-            }
-            if (['embEntryPage', 'embReportPage'].includes(pageId)) {
-                hasEmbAccess = true;
-            }
-            if (pageId === 'merchandisingPage' || pageId === 'merchandisingBuyersPage') {
-                const merchDropdown = document.getElementById('nav-merchandising-dropdown');
-                if (merchDropdown) merchDropdown.style.setProperty('display', 'flex', 'important');
-            }
-        }
-    });
-
-    // Personal modules logic (My Tasks, My Diary)
-    let hasPersonalAccess = false;
-    if (allowed.includes('myTasksPage')) {
-        const el = document.getElementById('nav-my-tasks');
-        if (el) el.style.setProperty('display', 'flex', 'important');
-        hasPersonalAccess = true;
-    }
-    if (allowed.includes('myDiaryPage')) {
-        const el = document.getElementById('nav-my-diary');
-        if (el) el.style.setProperty('display', 'flex', 'important');
-        hasPersonalAccess = true;
-    }
-
-    const personalDropdown = document.getElementById('nav-personal-dropdown');
-    if (personalDropdown && hasPersonalAccess) {
-        personalDropdown.style.setProperty('display', 'flex', 'important');
-    }
-
-    if (hasTrimsAccess && trimsDropdown) {
-        trimsDropdown.style.setProperty('display', 'flex', 'important');
-    }
-    if (hasEmbAccess && embDropdown) {
-        embDropdown.style.setProperty('display', 'flex', 'important');
-    }
+    const timeEl = document.getElementById('clockTime');
+    const dateEl = document.getElementById('clockDate');
+    if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', { hour12: true });
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }

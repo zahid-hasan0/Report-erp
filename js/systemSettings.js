@@ -29,6 +29,10 @@ const DEFAULT_SETTINGS = {
         activeMonth: "all",
         activeYear: "all"
     },
+    whatsapp_templates: {
+        emb_send_selected: "Dear Brother Need Some Emblishment Wo\n{jobNo}   {buyer}   {wo}   {status}   {comments}",
+        emb_full_report: "📦 EMB STATUS REPORT ({date})\n━━━━━━━━━━━━━━━━━━━━━━\n{index}. JOB: {jobNo} ━━ {buyer} ━━ {wo} ━━ {status} ━━ {comments}"
+    },
     globalNotice: "Welcome to Report Erp System!"
 };
 
@@ -86,4 +90,32 @@ export async function getWhatsAppContacts() {
 export async function getDashboardYears() {
     const settings = await getSystemSettings();
     return settings.dashboard?.availableYears || DEFAULT_SETTINGS.dashboard.availableYears;
+}
+
+/**
+ * Get a specific WhatsApp template
+ */
+export async function getWhatsAppTemplate(templateKey) {
+    const settings = await getSystemSettings();
+    return settings.whatsapp_templates?.[templateKey] || DEFAULT_SETTINGS.whatsapp_templates?.[templateKey] || "";
+}
+
+/**
+ * Update a specific WhatsApp template
+ */
+export async function updateWhatsAppTemplate(templateKey, content) {
+    try {
+        const settings = await getSystemSettings();
+        if (!settings.whatsapp_templates) {
+            settings.whatsapp_templates = {};
+        }
+        settings.whatsapp_templates[templateKey] = content;
+        await setSystemSettings(settings);
+        showToast("Template saved successfully!", "success");
+        return true;
+    } catch (error) {
+        console.error("Error updating template:", error);
+        showToast("Failed to save template.", "danger");
+        return false;
+    }
 }

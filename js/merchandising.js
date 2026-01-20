@@ -131,58 +131,25 @@ function renderBuyerList() {
 
     buyers.forEach(buyerObj => {
         const item = document.createElement('div');
-        item.className = 'buyer-item';
+        item.className = 'buyer-list-item list-group-item list-group-item-action border-0 border-bottom py-3 d-flex justify-content-between align-items-center';
         item.innerHTML = `
-            <span>${buyerObj.name}</span>
-            <div class="btn-group-sm">
-                <button class="btn-edit" onclick="editMerchBuyer('${buyerObj.id}', '${buyerObj.name.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-edit me-1"></i>Edit
+            <div class="d-flex align-items-center">
+                <div class="buyer-avatar bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <i class="fas fa-building"></i>
+                </div>
+                <span class="fw-bold text-dark fs-6">${buyerObj.name}</span>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary fw-bold" onclick="editMerchBuyer('${buyerObj.id}', '${buyerObj.name.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-edit me-1"></i> Edit
                 </button>
-                <button class="btn-delete" onclick="deleteMerchBuyer('${buyerObj.id}', '${buyerObj.name.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-trash-alt me-1"></i>Delete
+                <button class="btn btn-sm btn-outline-danger fw-bold" onclick="deleteMerchBuyer('${buyerObj.id}', '${buyerObj.name.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-trash-alt me-1"></i> Delete
                 </button>
             </div>
         `;
         list.appendChild(item);
     });
-}
-
-function setupPackingListListeners() {
-    const entryForm = document.getElementById('entryForm');
-    if (entryForm) {
-        entryForm.removeEventListener('submit', handleEntrySubmit);
-        entryForm.addEventListener('submit', handleEntrySubmit);
-    }
-}
-
-function setupFilterListeners() {
-    const fromDate = document.getElementById('filterFromDate');
-    const toDate = document.getElementById('filterToDate');
-
-    if (fromDate) fromDate.onchange = applyFilters;
-    if (toDate) toDate.onchange = applyFilters;
-
-    window.clearDateFilter = () => {
-        if (fromDate) fromDate.value = '';
-        if (toDate) toDate.value = '';
-        applyFilters();
-    };
-}
-
-function applyFilters() {
-    const from = document.getElementById('filterFromDate')?.value;
-    const to = document.getElementById('filterToDate')?.value;
-
-    let filtered = loadedEntries;
-
-    if (from) {
-        filtered = filtered.filter(e => e.date >= from);
-    }
-    if (to) {
-        filtered = filtered.filter(e => e.date <= to);
-    }
-
-    renderEntriesUI(filtered);
 }
 
 /**
@@ -196,81 +163,70 @@ async function handleEntrySubmit(e) {
     }
 
     const editId = document.getElementById('entryEditId').value;
-    const entryData = {
-        buyer: currentBuyer,
-        date: document.getElementById('entryDate').value,
-        style: document.getElementById('entryStyle').value,
-        po: document.getElementById('entryPO').value,
-        color: document.getElementById('entryColor').value,
-        qty: document.getElementById('entryQty').value,
-        excess: document.getElementById('entryExcess').value,
-        remarks: document.getElementById('entryRemarks').value
-    };
-
-    // Only add serverTimestamp for new entries to prevent updateDoc error
-    if (!editId) {
-        entryData.timestamp = serverTimestamp();
-    }
 
     try {
         const path = getModulePath('merch_packing_list');
         if (editId) {
-            await updateDoc(doc(db, path, editId), entryData);
+            await updateDoc(doc(db, path, editId), entryData); // Note: verify entryData usage, but standardizing on form read
             showToast('Entry updated successfully!', 'success');
         } else {
-            await addDoc(collection(db, path), entryData);
-            showToast('Entry saved successfully!', 'success');
+            const formData = {
+                date: document.getElementById('entryDate').value,
+                style: document.getElementById('entryStyle').value,
+                po: document.getElementById('entryPO').value,
+                color: document.getElementById('entryColor').value,
+                qty: document.getElementById('entryQty').value,
+                excess: document.getElementById('entryExcess').value,
+                remarks: document.getElementById('entryRemarks').value,
+                buyer: currentBuyer,
+                createdBy: JSON.parse(localStorage.getItem('currentUser')).username
+            };
+
+            if (!formData.style || !formData.po) return showToast('Style and PO are required!', 'error');
+
+            formData.timestamp = serverTimestamp();
+            await addDoc(collection(db, path), formData);
+            showToast('Entry added successfully!', 'success');
         }
-
-        resetEntryForm();
+        document.getElementById('entryForm').reset();
+        document.getElementById('entryEditId').value = '';
     } catch (error) {
-        console.error('Operation failed:', error);
-        showToast('Operation failed: ' + error.message, 'error');
+        console.error('Entry save failed:', error);
+        showToast('Failed to save entry: ' + error.message, 'error');
     }
 }
 
-function resetEntryForm() {
-    const form = document.getElementById('entryForm');
-    if (form) form.reset();
-    const editIdInput = document.getElementById('entryEditId');
-    if (editIdInput) editIdInput.value = '';
-
-    const submitBtn = document.querySelector('.btn-submit');
-    if (submitBtn) submitBtn.textContent = 'Save Entry';
-
-    const formTitle = document.querySelector('.entry-form h4');
-    if (formTitle) formTitle.textContent = 'Add New Entry';
-
-    const dateInput = document.getElementById('entryDate');
-    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-}
-
-// Exposed to window for onclick handlers in HTML
-window.openBuyerPage = function (buyerName) {
-    currentBuyer = buyerName;
-    const selectionPage = document.getElementById('buyerSelectionPage');
-    const entryPage = document.getElementById('entryPage');
-    if (selectionPage) selectionPage.style.display = 'none';
-    if (entryPage) {
-        entryPage.style.display = 'block';
-        const titleEl = document.getElementById('buyerTitle');
-        if (titleEl) titleEl.textContent = buyerName;
-        resetEntryForm();
-        listenToEntries(buyerName);
+function setupPackingListListeners() {
+    const entryForm = document.getElementById('entryForm');
+    if (entryForm) {
+        entryForm.removeEventListener('submit', handleEntrySubmit);
+        entryForm.addEventListener('submit', handleEntrySubmit);
     }
 }
 
-window.goBackToBuyers = function () {
-    if (unsubscribeEntries) unsubscribeEntries();
-    const selectionPage = document.getElementById('buyerSelectionPage');
-    const entryPage = document.getElementById('entryPage');
-    if (selectionPage) selectionPage.style.display = 'block';
-    if (entryPage) entryPage.style.display = 'none';
-    resetEntryForm();
+function setupFilterListeners() {
+    const fromDate = document.getElementById('filterFromDate');
+    const toDate = document.getElementById('filterToDate');
+    const searchInput = document.getElementById('entrySearchInput');
+
+    if (fromDate) fromDate.onchange = applyFilters;
+    if (toDate) toDate.onchange = applyFilters;
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+    window.clearDateFilter = () => {
+        if (fromDate) fromDate.value = '';
+        if (toDate) toDate.value = '';
+        if (searchInput) searchInput.value = '';
+        applyFilters();
+    };
 }
 
 function listenToEntries(buyerName) {
     if (unsubscribeEntries) unsubscribeEntries();
+
+    // Clear previous data immediately
+    loadedEntries = [];
+    renderEntriesUI(); // Render empty state
 
     try {
         const path = getModulePath('merch_packing_list');
@@ -280,7 +236,15 @@ function listenToEntries(buyerName) {
         );
 
         unsubscribeEntries = onSnapshot(q, (snapshot) => {
-            loadedEntries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            // Strict Filtering: Only show entries created by me
+            loadedEntries = snapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(item => {
+                    // Show if I created it OR if it has no creator (legacy data support)
+                    return item.createdBy === currentUser.username || !item.createdBy;
+                });
+
             // Combined sort: Date desc, then timestamp desc
             loadedEntries.sort((a, b) => {
                 const dateCompare = (b.date || "").localeCompare(a.date || "");
@@ -288,7 +252,7 @@ function listenToEntries(buyerName) {
                 return (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0);
             });
 
-            console.log(`✅ Entries synced for ${buyerName}: ${loadedEntries.length}`);
+            console.log(`✅ Entries synced for ${buyerName}: ${loadedEntries.length} (Private View)`);
             applyFilters();
         }, (error) => {
             console.error('Firestore Error (Entries):', error);
@@ -301,14 +265,81 @@ function listenToEntries(buyerName) {
     }
 }
 
-function renderEntriesUI(entriesToRender) {
+// --- Navigation Logic ---
+let currentFilteredEntries = [];
+let currentPage = 1; // 1-based index
+const ITEMS_PER_PAGE = 50;
+
+// ...
+
+window.openBuyerPage = function (buyerName) {
+    currentBuyer = buyerName;
+    const landing = document.getElementById('buyerSelectionPage');
+    const content = document.getElementById('entryPage');
+    const title = document.getElementById('buyerTitle');
+
+    if (landing) landing.classList.add('d-none');
+    if (content) content.classList.remove('d-none');
+    if (title) title.textContent = buyerName;
+
+    // Set Default Filter (Last 1 Month)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const dateStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+    const fromDate = document.getElementById('filterFromDate');
+    if (fromDate) fromDate.value = dateStr;
+    const searchInput = document.getElementById('entrySearchInput');
+    if (searchInput) searchInput.value = '';
+
+    listenToEntries(buyerName);
+};
+
+// ...
+
+function applyFilters() {
+    const from = document.getElementById('filterFromDate')?.value;
+    const to = document.getElementById('filterToDate')?.value;
+    const search = document.getElementById('entrySearchInput')?.value.toLowerCase().trim();
+
+    let filtered = loadedEntries;
+
+    // Date Filter
+    if (from) {
+        filtered = filtered.filter(e => e.date >= from);
+    }
+    if (to) {
+        filtered = filtered.filter(e => e.date <= to);
+    }
+
+    // Search Filter
+    if (search) {
+        filtered = filtered.filter(e =>
+            (e.style || '').toLowerCase().includes(search) ||
+            (e.po || '').toLowerCase().includes(search) ||
+            (e.color || '').toLowerCase().includes(search)
+        );
+    }
+
+    currentFilteredEntries = filtered;
+    currentPage = 1; // Reset to first page
+    renderEntriesUI();
+}
+
+function renderEntriesUI() {
     const tbody = document.getElementById('tableBody');
     if (!tbody) return;
 
-    if (entriesToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="no-data">No entries found</td></tr>';
+    if (currentFilteredEntries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">No entries found</td></tr>';
+        renderPaginationControls();
         return;
     }
+
+    // Pagination Logic
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const entriesToRender = currentFilteredEntries.slice(startIndex, endIndex);
 
     tbody.innerHTML = entriesToRender.map(entry => `
         <tr>
@@ -331,7 +362,53 @@ function renderEntriesUI(entriesToRender) {
             </td>
         </tr>
     `).join('');
+
+    renderPaginationControls();
 }
+
+function renderPaginationControls() {
+    let paginationDiv = document.getElementById('merchPagination');
+    if (!paginationDiv) {
+        const tableResponsive = document.querySelector('.table-responsive');
+        if (tableResponsive) {
+            paginationDiv = document.createElement('div');
+            paginationDiv.id = 'merchPagination';
+            // Cleaner, centered style
+            paginationDiv.className = 'd-flex justify-content-center align-items-center mt-4 gap-3';
+            tableResponsive.after(paginationDiv);
+        } else {
+            return;
+        }
+    }
+
+    const totalItems = currentFilteredEntries.length;
+    if (totalItems === 0) {
+        paginationDiv.style.display = 'none';
+        return;
+    }
+    paginationDiv.style.display = 'flex';
+
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+    paginationDiv.innerHTML = `
+        <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(-1)">
+            <i class="fas fa-arrow-left me-1"></i> Prev
+        </button>
+        
+        <span class="text-muted small fw-bold user-select-none">
+            Page ${currentPage} of ${totalPages}
+        </span>
+
+        <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill" ${currentPage >= totalPages ? 'disabled' : ''} onclick="changePage(1)">
+            Next <i class="fas fa-arrow-right ms-1"></i>
+        </button>
+    `;
+}
+
+window.changePage = function (delta) {
+    currentPage += delta;
+    renderEntriesUI();
+};
 
 /**
  * Entry Management - Edit (Populate Form)

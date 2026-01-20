@@ -106,7 +106,7 @@ export function getModulePath(moduleName = 'bookings') {
   // Shared root collections (No isolation for system-wide modules)
   const isPersonalModule = moduleName === 'my_tasks' || moduleName === 'my_diary';
 
-  if (!isPersonalModule && (moduleName === 'buyers' || moduleName === 'bookings' || moduleName === 'emb_reports' || moduleName === 'merch_buyers' || moduleName === 'merch_packing_list' || user.role === 'admin')) {
+  if (!isPersonalModule && (moduleName === 'buyers' || moduleName === 'bookings' || moduleName === 'emb_reports' || moduleName === 'buyer_notes' || user.role === 'admin')) {
     return actualName;
   }
 

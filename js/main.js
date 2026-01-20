@@ -5,7 +5,7 @@ import { loadBuyers } from './buyerManager.js';
 import { addNotice } from './notice.js';
 import { showToast } from "./toast.js";
 import { initProfile } from "./profile.js";
-import { initAuthGuard, logoutUser } from "./auth.js";
+import { initAuthGuard, logoutUser, updateSidebarVisibility, canAccessPage, getFirstAllowedPage } from "./auth.js"; // Added getFirstAllowedPage
 import { setupReportListeners } from "./summary.js";
 import { initNotifications } from "./notifications.js";
 import { loadUserProfile, initProfileDropdown } from "./profileManagement.js";
@@ -20,12 +20,40 @@ export function applyUserZoom() {
     document.body.style.zoom = `${zoom}%`;
 }
 window.applyUserZoom = applyUserZoom;
-window.updateSidebarAccess = (function (orig) {
-    return function (user) {
-        if (typeof orig === 'function') orig(user);
-        applyUserZoom();
-    };
-})(window.updateSidebarAccess);
+
+// Hook sidebar access to zoom
+window.updateSidebarAccess = function (user) {
+    // This function acts as a hook. Auth.js calls it.
+    applyUserZoom();
+    // Also ensure visibility is updated just in case called from elsewhere
+    updateSidebarVisibility(user);
+
+    // FIX: Auto-reload content if we are stuck on a restricted view but now have access
+    const appContent = document.getElementById('app-content');
+    const isRestricted = appContent && appContent.innerHTML.includes('Access Restricted');
+
+    if (isRestricted) {
+        const defaultPage = user?.defaultPage || 'dashboardPage';
+
+        // Re-import locally or use global if available
+        import('./auth.js').then(m => {
+            // 1. Try Default Page
+            if (m.canAccessPage(defaultPage)) {
+                console.log("🔓 Permissions updated! Auto-reloading default page...");
+                showPage(defaultPage);
+                return;
+            }
+
+            // 2. Try Smart Redirect (Any Allowed Page)
+            const altPage = m.getFirstAllowedPage(user);
+            if (altPage) {
+                console.log(`🔓 Permissions updated! Smart Redirecting to ${altPage}...`);
+                showPage(altPage);
+            }
+
+        }).catch(e => console.error(e));
+    }
+};
 
 // 1. Initialize Auth Guard immediately (for redirects)
 initAuthGuard();
@@ -39,7 +67,15 @@ window.addNotice = addNotice;
 window.addEventListener('load', async () => {
     console.log('🚀 Application initializing...');
 
-    // Attach listeners and load notifications after DOM is ready
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    // Safety check: if no user, checkAuth() already handled redirect to login
+    if (!currentUser) return;
+
+    // FORCE Sidebar Visibility Update
+    updateSidebarVisibility(currentUser);
+
+    // Attach listeners
     setupReportListeners();
     initNotifications();
     initProfile();
@@ -47,7 +83,6 @@ window.addEventListener('load', async () => {
     initProfileDropdown();
     initAnnouncements();
 
-    // Initialize Merchandising Global with error safety
     try {
         initMerchandisingGlobal();
     } catch (e) {
@@ -56,25 +91,36 @@ window.addEventListener('load', async () => {
 
     try {
         console.log('📦 Loading initial data...');
-        // Load both bookings and buyers on startup
         await Promise.all([
             loadBookings(),
             loadBuyers()
         ]);
         console.log('✅ All data loaded successfully');
 
-        // Check for User Default Page
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const defaultPage = currentUser.defaultPage || 'dashboardPage';
+        // --- OPEN ACCESS STARTUP ---
+        // Just load the user's preferred page (or Dashboard)
+        const preferredPage = currentUser.defaultPage || 'dashboardPage';
 
-        console.log(`➡️ Redirecting to default page: ${defaultPage}`);
-        showPage(defaultPage);
+        console.log(`➡️ Open Access: Loading ${preferredPage}`);
+        showPage(preferredPage);
         applyUserZoom();
+
     } catch (error) {
         console.error('❌ Error loading data:', error);
         showToast('Error loading data. Please refresh.', 'error');
-        showPage('dashboardPage');
     }
+
+    // Initialize Date Widget
+    updateDateWidget();
 });
+
+function updateDateWidget() {
+    const dateEl = document.getElementById('currentDate');
+    if (dateEl) {
+        const now = new Date();
+        const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+        dateEl.textContent = now.toLocaleDateString('en-US', options);
+    }
+}
 
 console.log('✅ main.js loaded successfully');

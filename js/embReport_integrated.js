@@ -52,7 +52,13 @@ export async function initEmbReportView() {
 
 function setupEventListeners() {
     const ui = getUI();
-    if (ui.addBtn) ui.addBtn.onclick = handleAddDrafts;
+    if (ui.addBtn) {
+        console.log("✅ Attach 'Add Draft' listener");
+        ui.addBtn.onclick = handleAddDrafts;
+    } else {
+        console.error("❌ 'Add Draft' button not found in UI");
+    }
+
     if (ui.submitSelectedBtn) ui.submitSelectedBtn.onclick = handleSubmitSelected;
     if (ui.checkAll) ui.checkAll.onchange = toggleSelectAll;
     if (ui.deleteAllBtn) ui.deleteAllBtn.onclick = handleDeleteAll;
@@ -102,8 +108,11 @@ function saveDrafts() {
 }
 
 function handleAddDrafts() {
+    console.log("👉 handleAddDrafts triggered");
     const ui = getUI();
     const input = ui.jobInput?.value.trim();
+    console.log("Input value:", input);
+
     if (!input) return showToast("Enter job numbers.", "warning");
 
     const jobs = [...new Set(input.split(/,|\n/).map(j => j.trim()).filter(j => j !== ""))];

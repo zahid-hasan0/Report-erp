@@ -1,137 +1,97 @@
-/* emb-entry.css */
+/* emb-entry.css - Professional Style */
 
-/* Variables */
-:root {
-    --primary-blue: #0000FF;
-    --dark-blue: #1e3a8a;
-    --gold-brown: #92400e;
-    --danger-red: #dc2626;
-    --table-green: #dcfce7;
-    --border-gray: #e2e8f0;
-    --bg-light: #f8fafc;
-    --primary-gradient: linear-gradient(135deg, #2563eb, #1e40af);
-    --gold-gradient: linear-gradient(135deg, #fc9f00, #d97706);
-    --danger-gradient: linear-gradient(135deg, #f80000, #b10d0d);
-    --success-gradient: linear-gradient(135deg, #0a8f27, #059618);
-    --whatsapp-green: #04a81a;
-}
-
-#emb-report-module .container-main {
-    max-width: 100%;
-    padding: 0;
-}
-
-#emb-report-module .app-title {
-    display: none;
-}
-
-#emb-report-module .panel-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-#emb-report-module .panel-header {
-    background: #1e293b;
-    color: white;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    user-select: none;
-}
-
-.panel-header .collapse-icon {
-    transition: transform 0.3s ease;
-}
-
-.panel-header.collapsed .collapse-icon {
-    transform: rotate(-90deg);
-}
-
-.panel-body {
-    padding: 1.5rem;
-}
-
-#emb-report-module .form-control {
-    border: 1px solid #e2e8f0;
+/* Match booking page card style */
+.booking-list-card {
+    border: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border-radius: 8px;
-    padding: 0.75rem;
-    background: #f8fafc;
-    transition: all 0.2s;
 }
 
-#emb-report-module .form-control:focus {
+.booking-list-card .card-header {
     background: white;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    border-bottom: 1px solid #e9ecef;
 }
 
-.toolbar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: white;
-    border-bottom: 1px solid var(--border-gray);
-    overflow-x: auto;
+/* Professional table styling */
+.table {
+    margin-bottom: 0;
 }
 
-.table-gms thead th {
+.table-hover tbody tr:hover {
     background-color: #f1f5f9;
-    color: #475569;
-    font-weight: 700;
-    border: none;
-    padding: 1rem 0.75rem;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    transition: background-color 0.2s ease;
 }
 
-.table-gms td {
-    vertical-align: middle;
-    padding: 1rem 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    /* Prevent wrapping by default */
-}
-
-/* Allow wrapping only for comments */
-.table-gms td:nth-child(7) {
-    white-space: normal;
-}
-
-.table-gms tbody tr:hover {
+.table thead.table-light th {
     background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 10px;
+    font-size: 0.85rem;
+    vertical-align: middle;
 }
 
+.table tbody td {
+    padding: 10px;
+    vertical-align: middle;
+    font-size: 0.875rem;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Prevent text wrapping in all columns */
+.table td,
+.table th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Comments column - fixed width with ellipsis */
+.table tbody td:nth-child(7) {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Form controls */
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button styling */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Action buttons in table rows */
 .btn-gms-row {
     font-size: 0.75rem;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
     font-weight: 600;
 }
 
-.animate {
-    animation: fadeIn 0.4s ease forwards;
+/* Input fields in table */
+.table input.form-control,
+.table select.form-select {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border: 1px solid #dee2e6;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.table input.form-control:focus,
+.table select.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
 }

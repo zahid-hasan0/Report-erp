@@ -162,7 +162,7 @@ export function generatePDFReport(bookings, reportType = 'all', monthYear = '') 
             { align: 'center' }
         );
         doc.text(
-            '© 2026 Report Erp - Automated Booking System',
+            '© 2026 Report ERP and MIS - Automated Booking System',
             pageWidth / 2,
             doc.internal.pageSize.getHeight() - 5,
             { align: 'center' }

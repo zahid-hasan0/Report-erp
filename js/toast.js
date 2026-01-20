@@ -1,8 +1,8 @@
 // toast.js
 export function showToast(message, type = "success") {
     let container = document.getElementById("toastContainer");
-    
-   
+
+
     if (!container) {
         container = document.createElement("div");
         container.id = "toastContainer";
@@ -22,21 +22,16 @@ export function showToast(message, type = "success") {
     }
 
     const toast = document.createElement("div");
-    
-  
-    const icon = type === "success" 
-        ? '<i class="fas fa-check-circle me-2"></i>' 
-        : '<i class="fas fa-exclamation-circle me-2"></i>';
-    
-    toast.innerHTML = icon + message;
-    
+
+    toast.innerHTML = message;
+
     toast.style.cssText = `
         min-width: 300px;
         max-width: 500px;
         padding: 16px 24px;
         color: white;
-        background: ${type === "success" 
-            ? "linear-gradient(135deg, #0fa80aff, #10b60aff)" 
+        background: ${type === "success"
+            ? "linear-gradient(135deg, #0fa80aff, #10b60aff)"
             : "linear-gradient(135deg, #a80909ff, #a80404ff)"};
         border-radius: 12px;
         text-align: center;
@@ -53,10 +48,10 @@ export function showToast(message, type = "success") {
         justify-content: center;
         letter-spacing: 0.2px;
     `;
-    
+
     container.appendChild(toast);
 
- 
+
     requestAnimationFrame(() => {
         toast.style.opacity = 1;
         toast.style.transform = "translateY(0)";

@@ -231,22 +231,20 @@ export async function addBuyer() {
     }
 }
 
-// Display buyer list with edit/delete options
+// Display buyer list with premium ERP styling
 function displayBuyerList() {
     const container = document.getElementById('buyerListContainer');
-    if (!container) {
-        // console.log('⚠️ buyerListContainer not found'); 
-        return;
-    }
+    const countEl = document.getElementById('totalBuyersCount');
 
-    // console.log('🔄 Displaying buyer list...');
+    if (countEl) countEl.textContent = buyers.length;
+    if (!container) return;
 
     if (!buyers.length) {
         container.innerHTML = `
-            <div class="text-center py-4" style="color: #64748b;">
-                <i class="fas fa-inbox fa-3x mb-3" style="opacity: 0.3;"></i>
-                <p>No buyers added yet</p>
-                <p class="text-muted small">Click "Add Buyer" above to get started</p>
+            <div class="text-center py-5" style="color: #64748b;">
+                <i class="fas fa-inbox fa-4x mb-3 opacity-25"></i>
+                <h5 class="fw-bold">No Buyers Found</h5>
+                <p class="text-muted small">Your directory is currently empty. Add a buyer to get started.</p>
             </div>
         `;
         return;
@@ -254,26 +252,37 @@ function displayBuyerList() {
 
     container.innerHTML = `
         <div class="table-responsive">
-            <table class="table table-hover table-striped">
-                <thead class="table-light">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
                     <tr>
-                        <th style="width: 60px; text-align: center;">SL</th>
-                        <th>Buyer Name</th>
-                        <th style="width: 200px; text-align: right;">Actions</th>
+                        <th class="ps-4" style="width: 80px;">SL</th>
+                        <th>Buyer Identity</th>
+                        <th class="text-end pe-4" style="width: 200px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="border-top-0">
                     ${buyers.map((buyer, index) => `
                         <tr>
-                            <td class="text-center fw-bold text-secondary">${index + 1}</td>
-                            <td class="fw-bold text-dark">${buyer.name}</td>
-                            <td class="text-end">
-                                <button onclick="window.editBuyerName('${buyer.id}')" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="window.deleteBuyer('${buyer.id}')" class="btn btn-sm btn-outline-danger" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <td class="ps-4">
+                                <span class="badge bg-light text-secondary rounded-pill px-3">${String(index + 1).padStart(2, '0')}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm me-3 rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">
+                                        ${buyer.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="fw-bold text-dark h6 mb-0">${buyer.name}</div>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button onclick="window.editBuyerName('${buyer.id}')" class="btn btn-sm btn-icon btn-outline-primary border-0 rounded-circle" title="Edit Profile" style="width: 32px; height: 32px; padding: 0;">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="window.deleteBuyer('${buyer.id}')" class="btn btn-sm btn-icon btn-outline-danger border-0 rounded-circle" title="Remove Profile" style="width: 32px; height: 32px; padding: 0;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `).join('')}
@@ -281,9 +290,28 @@ function displayBuyerList() {
             </table>
         </div>
     `;
-
-    // console.log(`✅ Displayed ${buyers.length} buyers in table`);
 }
+
+// Global Filter Function
+window.filterBuyerTable = function (term) {
+    const list = document.getElementById('buyerListContainer');
+    if (!list) return;
+
+    const searchTerm = term.toLowerCase();
+    const filtered = buyers.filter(b => b.name.toLowerCase().includes(searchTerm));
+
+    if (filtered.length === 0) {
+        list.querySelector('tbody').innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted">No buyers match your search</td></tr>`;
+        return;
+    }
+
+    // Direct DOM update for performance
+    const rows = list.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const name = row.querySelector('.h6').textContent.toLowerCase();
+        row.style.display = name.includes(searchTerm) ? '' : 'none';
+    });
+};
 
 // Edit buyer name
 export async function editBuyerName(id) {

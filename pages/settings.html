@@ -9,41 +9,38 @@
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    /* 1. Dark Sidebar */
+    /* 1. Dark Sidebar - Modern & Floating Feel */
     .pro-settings-sidebar {
         width: 280px;
         min-width: 280px;
-        background: #0f172a;
-        /* Slate-900 */
-        color: #e2e8f0;
+        background: #ffffff;
+        border-right: 1px solid #f1f5f9;
         display: flex;
         flex-direction: column;
-        padding: 1.5rem 1rem;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+        padding: 2rem 1rem;
         z-index: 10;
     }
 
     .sidebar-header {
-        padding: 0 1rem 2rem 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 1.5rem;
+        padding: 0 1rem 1.5rem 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .sidebar-header h4 {
-        color: white;
-        font-weight: 700;
+        color: #0f172a;
+        font-weight: 800;
         letter-spacing: -0.5px;
         margin: 0;
+        font-size: 1.25rem;
     }
 
     .nav-group-title {
         text-transform: uppercase;
-        font-size: 0.70rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        color: #64748b;
-        /* Slate-500 */
-        letter-spacing: 1px;
-        margin-bottom: 0.75rem;
+        color: #94a3b8;
+        letter-spacing: 0.05em;
+        margin: 1.5rem 0 0.75rem 0;
         padding-left: 1rem;
     }
 
@@ -51,56 +48,62 @@
         display: flex;
         align-items: center;
         width: 100%;
-        padding: 0.85rem 1rem;
+        padding: 0.75rem 1rem;
         margin-bottom: 0.25rem;
-        color: #cbd5e1;
-        /* Slate-300 */
+        color: #64748b;
         background: transparent;
         border: none;
         border-radius: 8px;
         font-weight: 500;
-        font-size: 0.95rem;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
         text-align: left;
+        cursor: pointer;
     }
 
     .pro-nav-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
+        background: #f8fafc;
+        color: #334155;
     }
 
     .pro-nav-item.active {
-        background: #2563eb;
-        /* Blue-600 */
-        color: white;
+        background: #eff6ff;
+        color: #2563eb;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
     .pro-nav-item i {
-        width: 24px;
+        width: 20px;
         margin-right: 12px;
-        font-size: 1.1rem;
-        opacity: 0.8;
+        font-size: 1rem;
+        opacity: 0.9;
+        text-align: center;
     }
 
-    /* 2. Content Area */
+    /* 2. Content Area - Clean & Spacious */
     .pro-settings-content {
         flex: 1;
-        padding: 2.5rem;
+        padding: 3rem 4rem;
         overflow-y: auto;
+        background-color: #fcfcfc;
     }
 
     .settings-header {
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
     }
 
     .settings-header h2 {
-        font-weight: 700;
-        color: #1e293b;
+        font-weight: 800;
+        color: #0f172a;
         margin-bottom: 0.5rem;
-        letter-spacing: -0.5px;
+        letter-spacing: -1px;
+        font-size: 1.75rem;
     }
+
+    .settings-header p {
+        font-size: 1rem;
+    }
+
 
     .pro-card {
         background: white;
@@ -250,6 +253,7 @@
     }
 
     .user-role-badge {
+        display: none !important;
         position: absolute;
         top: 1rem;
         right: 1rem;
@@ -400,9 +404,14 @@
             <i class="fas fa-chart-pie"></i> Dashboard
         </button>
 
-        <div class="nav-group-title mt-4">Integrations</div>
         <button class="pro-nav-item settings-nav-item" data-tab="whatsapp-settings">
             <i class="fab fa-whatsapp"></i> WhatsApp API
+        </button>
+        <button class="pro-nav-item settings-nav-item" data-tab="template-settings">
+            <i class="fas fa-comment-dots"></i> Message Templates
+        </button>
+        <button class="pro-nav-item settings-nav-item" data-tab="email-settings">
+            <i class="fas fa-envelope-open-text"></i> Email Reporting
         </button>
 
         <div class="nav-group-title mt-4">Account</div>
@@ -440,6 +449,7 @@
                                 <th class="ps-4">User Identity</th>
                                 <th>Role & Permissions</th>
                                 <th>Access Level</th>
+                                <th>Last Active</th>
                                 <th class="text-end pe-4">Actions</th>
                             </tr>
                         </thead>
@@ -546,7 +556,149 @@
             </div>
         </div>
 
-        <!-- Dashboard Settings -->
+        <!-- Message Templates Tab -->
+        <div id="template-settings" class="settings-section d-none">
+            <div class="settings-header">
+                <h2>Message Templates</h2>
+                <p class="text-muted">Customize automated message formats for WhatsApp.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="pro-card h-100 border-0 shadow-sm">
+                        <div class="pro-card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="pro-card-title mb-0 fw-bold">EMB - Send Selected</h5>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3">Active</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-body p-4">
+                            <label class="form-label small fw-bold text-uppercase text-muted mb-2">Message
+                                Format</label>
+                            <div class="position-relative">
+                                <textarea id="template_emb_send_selected"
+                                    class="form-control bg-light border-0 font-monospace p-3"
+                                    style="height: 200px; font-size: 0.85rem; line-height: 1.6;"
+                                    placeholder="Enter your message template here..."></textarea>
+                            </div>
+                            <div class="mt-3 p-3 bg-light rounded text-muted small">
+                                <strong class="d-block mb-2 text-dark">Available Variables:</strong>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{jobNo}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{buyer}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{wo}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{status}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{comments}</span>
+                            </div>
+                            <button class="btn btn-primary w-100 mt-4 py-2 fw-medium"
+                                onclick="saveWhatsAppTemplate('emb_send_selected')">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="pro-card h-100 border-0 shadow-sm">
+                        <div class="pro-card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="pro-card-title mb-0 fw-bold">EMB - Full Report</h5>
+                                <span class="badge bg-info-subtle text-info rounded-pill px-3">Active</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-body p-4">
+                            <label class="form-label small fw-bold text-uppercase text-muted mb-2">Message
+                                Format</label>
+                            <div class="position-relative">
+                                <textarea id="template_emb_full_report"
+                                    class="form-control bg-light border-0 font-monospace p-3"
+                                    style="height: 200px; font-size: 0.85rem; line-height: 1.6;"
+                                    placeholder="Enter your message template here..."></textarea>
+                            </div>
+                            <div class="mt-3 p-3 bg-light rounded text-muted small">
+                                <strong class="d-block mb-2 text-dark">Available Variables:</strong>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{date}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{index}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{jobNo}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{buyer}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{wo}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{status}</span>
+                                <span class="badge bg-white border text-secondary me-1 mb-1">{comments}</span>
+                            </div>
+                            <button class="btn btn-primary w-100 mt-4 py-2 fw-medium"
+                                onclick="saveWhatsAppTemplate('emb_full_report')">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Settings -->
+        <div id="email-settings" class="settings-section d-none">
+            <div class="settings-header">
+                <h2>Email Reporting</h2>
+                <p class="text-muted">Configure and distribute buyer-wise performance reports.</p>
+            </div>
+
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h5 class="pro-card-title">Delivery Configuration</h5>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1"
+                        style="font-size: 10px;">EmailJS Service</span>
+                </div>
+                <div class="pro-card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Target Month</label>
+                            <select id="emailMonth" class="form-select bg-light border-0">
+                                <option value="all">All Months</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Target Year</label>
+                            <select id="emailYear" class="form-select bg-light border-0">
+                                <option value="all">All Years</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Provider</label>
+                            <select id="emailService" class="form-select bg-light border-0">
+                                <option value="GMAIL">Google Workspace</option>
+                                <option value="OUTLOOK">Microsoft Outlook</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Recipient Address</label>
+                            <input type="email" class="form-control bg-light border-0" id="recipientEmail"
+                                placeholder="e.g. manager@gms-composite.com">
+                        </div>
+                    </div>
+                </div>
+                <div class="pro-card-footer bg-light p-4 border-top d-flex gap-2">
+                    <button class="btn btn-primary px-5 py-2 fw-bold" id="sendEmailBtn"
+                        onclick="sendEmailWithFilter()">Transmit Report</button>
+                    <button class="btn btn-outline-secondary px-4 py-2" onclick="downloadWithFilter()">Download
+                        HTML</button>
+                </div>
+            </div>
+        </div>
         <div id="dashboard-settings" class="settings-section d-none">
             <div class="settings-header">
                 <h2>Dashboard Controls</h2>
@@ -724,62 +876,8 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-privilege">
-                        <div class="d-flex flex-column gap-2">
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Dashboard Access</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="dashboardPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Bookings Module</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="bookingPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Buyer Library</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="buyerManagementPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Reports Analysis</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="reportPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Embellishment Entry</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="embEntryPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Embellishment Reports</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="embReportPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Buyer Notes</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="buyerNotesPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Packing List</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="merchandisingPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Manage Buyers (Merch)</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="merchandisingBuyersPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">My Task Planner</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="myTasksPage"></div>
-                            </div>
-                            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <span class="perm-label">Personal Diary</span>
-                                <div class="form-check form-switch m-0"><input class="form-check-input perm-check"
-                                        type="checkbox" value="myDiaryPage"></div>
-                            </div>
+                        <div class="d-flex flex-column gap-2" id="modulePermissionsContainer">
+                            <!-- Dynamically populated by js/adminSettings.js -->
                         </div>
                     </div>
                 </div>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="./gms icon.png" type="image/x-icon">
-    <title>Report Erp System </title>
+    <title>REPORT ERP SYSTEM </title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -48,39 +48,32 @@
             <div class="sidebar-header">
                 <a href="#" class="bg-brand">
                     <img src="./gms icon.png" alt="Logo" class="logo-img">
-                    <span>Report Erp</span>
+                    <span>REPORT ERP </span>
                 </a>
             </div>
 
             <nav class="sidebar-menu">
                 <a onclick="showPage('dashboardPage')" class="nav-link active" id="nav-dashboard">
-                    <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
 
                 <!-- Trims Dropdown -->
                 <a class="nav-link collapsed d-flex justify-content-between align-items-center"
                     data-bs-toggle="collapse" href="#trimsSubmenu" role="button" aria-expanded="false"
-                    aria-controls="trimsSubmenu">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-layer-group"></i>
-                        <span>Trims</span>
-                    </div>
+                    aria-controls="trimsSubmenu" id="nav-trims-dropdown">
+                    <span>Trims</span>
                     <i class="fas fa-chevron-down" style="font-size: 0.8em; transition: transform 0.3s;"></i>
                 </a>
 
                 <div class="collapse" id="trimsSubmenu">
                     <div class="nav flex-column ms-3 ps-2" style="border-left: 2px solid rgba(255,255,255,0.1);">
                         <a onclick="showPage('bookingPage')" class="nav-link" id="nav-booking">
-                            <i class="fas fa-plus-circle"></i>
                             <span>Bookings</span>
                         </a>
                         <a onclick="showPage('buyerManagementPage')" class="nav-link" id="nav-buyers">
-                            <i class="fas fa-users"></i>
                             <span>Buyer Library</span>
                         </a>
                         <a onclick="showPage('reportPage')" class="nav-link" id="nav-reports">
-                            <i class="fas fa-chart-line"></i>
                             <span>Reports</span>
                         </a>
                     </div>
@@ -89,46 +82,41 @@
                 <!-- EMB Dropdown -->
                 <a class="nav-link collapsed d-flex justify-content-between align-items-center"
                     data-bs-toggle="collapse" href="#embSubmenu" role="button" aria-expanded="false"
-                    aria-controls="embSubmenu">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-magic"></i>
-                        <span>EMB</span>
-                    </div>
+                    aria-controls="embSubmenu" id="nav-emb-dropdown">
+                    <span>EMB</span>
                     <i class="fas fa-chevron-down" style="font-size: 0.8em; transition: transform 0.3s;"></i>
                 </a>
 
                 <div class="collapse" id="embSubmenu">
                     <div class="nav flex-column ms-3 ps-2" style="border-left: 2px solid rgba(255,255,255,0.1);">
                         <a onclick="showPage('embEntryPage')" class="nav-link" id="nav-emb-entry">
-                            <i class="fas fa-edit"></i>
                             <span>Emb Entry</span>
                         </a>
                         <a onclick="showPage('embReportPage')" class="nav-link" id="nav-emb-report">
-                            <i class="fas fa-database"></i>
                             <span>Emb Reports</span>
                         </a>
                     </div>
                 </div>
 
+                <!-- Buyer Notes (Main Menu) -->
+                <a onclick="showPage('buyerNotesPage')" class="nav-link" id="nav-buyer-notes">
+                    <span>Buyer Notes</span>
+                </a>
+
                 <!-- Merchandising Dropdown -->
                 <a class="nav-link collapsed d-flex justify-content-between align-items-center"
                     data-bs-toggle="collapse" href="#merchandisingSubmenu" role="button" aria-expanded="false"
                     aria-controls="merchandisingSubmenu" id="nav-merchandising-dropdown">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Merchandising</span>
-                    </div>
+                    <span>Merchandising</span>
                     <i class="fas fa-chevron-down" style="font-size: 0.8em; transition: transform 0.3s;"></i>
                 </a>
 
                 <div class="collapse" id="merchandisingSubmenu">
                     <div class="nav flex-column ms-3 ps-2" style="border-left: 2px solid rgba(255,255,255,0.1);">
                         <a onclick="showPage('merchandisingPage')" class="nav-link" id="nav-merchandising">
-                            <i class="fas fa-box-open"></i>
                             <span>Packing List</span>
                         </a>
                         <a onclick="showPage('merchandisingBuyersPage')" class="nav-link" id="nav-merchandising-buyers">
-                            <i class="fas fa-users-cog"></i>
                             <span>Manage Buyers</span>
                         </a>
                     </div>
@@ -138,50 +126,40 @@
                 <a class="nav-link collapsed d-flex justify-content-between align-items-center"
                     data-bs-toggle="collapse" href="#personalSubmenu" role="button" aria-expanded="false"
                     aria-controls="personalSubmenu" id="nav-personal-dropdown">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="far fa-user-circle"></i>
-                        <span>My Task</span>
-                    </div>
+                    <span>My Task</span>
                     <i class="fas fa-chevron-down" style="font-size: 0.8em; transition: transform 0.3s;"></i>
                 </a>
 
                 <div class="collapse" id="personalSubmenu">
                     <div class="nav flex-column ms-3 ps-2" style="border-left: 2px solid rgba(255,255,255,0.1);">
                         <a onclick="showPage('myTasksPage')" class="nav-link" id="nav-my-tasks">
-                            <i class="far fa-check-square"></i>
                             <span>My Tasks</span>
                         </a>
                         <a onclick="showPage('myDiaryPage')" class="nav-link" id="nav-my-diary">
-                            <i class="far fa-sticky-note"></i>
                             <span>My Diary</span>
                         </a>
                     </div>
                 </div>
 
+                <a onclick="showPage('profilePage')" class="nav-link" id="nav-profile">
+                    <span>My Profile</span>
+                </a>
+
                 <a onclick="showPage('settingsPage')" class="nav-link" id="nav-settings" style="cursor: pointer;">
-                    <i class="fas fa-tools"></i>
                     <span>Settings</span>
                 </a>
             </nav>
 
 
             <!-- Profile Dropdown Card (in sidebar) -->
-            <div id="sidebarProfileDropdown" class="sidebar-profile-dropdown">
-                <div class="profile-dropdown-content position-relative">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2"
-                        onclick="toggleProfileDropdown()" aria-label="Close"></button>
-                    <div class="text-center mb-3 mt-2">
-                        <img id="dropdownProfileImage" src="./gms icon.png" alt="Profile"
-                            style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.2);">
-                        <h6 id="dropdownProfileName" class="mt-2 mb-0 fw-bold text-white">User Name</h6>
-                        <p class="text-white-50 small mb-0" id="dropdownUserRole">Role</p>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-light btn-sm" id="sidebarEditProfileBtn">
-                            <i class="fas fa-edit me-2"></i>Edit Profile
-                        </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="logoutUser()">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+            <div id="sidebarProfileDropdown" class="sidebar-profile-dropdown"
+                style="border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -5px 20px rgba(0,0,0,0.3);">
+                <div class="profile-dropdown-content position-relative p-3" style="background: #1e293b;">
+                    <!-- Close button removed as requested -->
+                    <div class="d-grid">
+                        <button class="btn text-white fw-bold shadow-sm" onclick="logoutUser()"
+                            style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: none; border-radius: 8px; padding: 10px; font-size: 14px; letter-spacing: 0.5px;">
+                            <i class="fas fa-sign-out-alt me-2"></i>Sign Out
                         </button>
                     </div>
                 </div>
@@ -549,28 +527,42 @@
     <!-- Profile View Modal (First Step) -->
     <div class="modal fade" id="profileViewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-user-circle me-2 text-primary"></i>My Profile</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header border-0 pb-0 pt-4 px-4 justify-content-center">
+                    <h5 class="modal-title fw-bold text-dark text-uppercase" style="letter-spacing: 1px;">My Profile
+                    </h5>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4 pt-2">
                     <!-- Profile Display -->
-                    <div class="text-center mb-4">
-                        <img id="viewModalProfileImage" src="./gms icon.png" alt="Profile"
-                            style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0;">
-                        <h6 id="viewModalProfileName" class="mt-3 mb-1 fw-bold">User Name</h6>
-                        <p class="text-muted small mb-0" id="viewModalUserRole">Role</p>
+                    <div class="text-center mb-4 mt-2">
+                        <div class="position-relative d-inline-block p-1 rounded-circle"
+                            style="background: linear-gradient(135deg, #e2e8f0 0%, #ffffff 100%); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                            <img id="viewModalProfileImage" src="./gms icon.png" alt="Profile"
+                                style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid white;">
+                        </div>
+                        <h5 id="viewModalProfileName" class="mt-3 mb-1 fw-bold text-dark">User Name</h5>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold" id="viewModalUserRole"
+                            style="letter-spacing: 1px;">Role</p>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-primary" id="openEditProfileBtn">
-                            <i class="fas fa-edit me-2"></i>Edit Profile
+                    <div class="d-grid gap-3">
+                        <button class="btn btn-light py-2 fw-semibold text-start px-3 shadow-sm border"
+                            id="openEditProfileBtn" style="border-radius: 10px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-user-edit me-2 text-primary"></i>Edit details</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </div>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="logoutUser()" data-bs-dismiss="modal">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+
+                        <button class="btn text-white py-2 fw-bold shadow mt-2" onclick="logoutUser()"
+                            data-bs-dismiss="modal"
+                            style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: none; border-radius: 10px; transition: transform 0.2s;">
+                            <i class="fas fa-sign-out-alt me-2"></i>Sign Out
                         </button>
+
+                        <button class="btn btn-link text-muted text-decoration-none small mt-1"
+                            data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -651,6 +643,23 @@
                 if (searchInput) searchInput.focus();
             });
         }
+    </script>
+
+    <!-- Clock Script -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const dateParams = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            const timeParams = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+
+            const dateEl = document.getElementById('clockDate');
+            const timeEl = document.getElementById('clockTime');
+
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', dateParams);
+            if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', timeParams);
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // Run immediately
     </script>
 
     <!-- Clock Modal -->

@@ -26,6 +26,7 @@ export async function initSettings() {
             // Re-render data when switching tabs (optional but good for freshness)
             if (targetId === 'general-settings') renderGeneralSettings();
             if (targetId === 'whatsapp-settings') renderWhatsAppSettings();
+            if (targetId === 'email-settings') console.log("📧 Email Reporting tab active");
             if (targetId === 'dashboard-settings') renderDashboardSettings();
             if (targetId === 'system-status') refreshSystemLogs();
         });
@@ -52,6 +53,7 @@ export async function initSettings() {
     renderGeneralSettings();
     renderWhatsAppSettings();
     renderDashboardSettings();
+    await loadWhatsAppTemplates();
 }
 
 // --- Load User List ---
@@ -141,6 +143,14 @@ function renderUserList() {
             </td>
             <td>${roleBadge}</td>
             <td>${modulesSummary}</td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <span class="badge ${user.isOnline ? 'bg-success' : 'bg-secondary'} rounded-circle p-1 me-2" style="width: 10px; height: 10px;"></span>
+                    <div class="small text-muted">
+                        ${user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : 'Never'}
+                    </div>
+                </div>
+            </td>
             <td class="text-end pe-4">
                 <button class="btn btn-sm btn-white border shadow-sm fw-bold px-3" onclick="openUserManagementModal('${user.username}')">
                     <i class="fas fa-cog me-1 text-secondary"></i> Manage
@@ -190,11 +200,8 @@ window.openUserManagementModal = function (username) {
     const zoomLevelSelect = document.getElementById('manageZoomLevel');
     if (zoomLevelSelect) zoomLevelSelect.value = user.zoomLevel || '100';
 
-    // 2. Populate Privileges Tab
-    const modules = user.allowedModules || [];
-    document.querySelectorAll('.perm-check').forEach(check => {
-        check.checked = modules.includes(check.value);
-    });
+    // 2. Render & Populate Privileges
+    renderModulePermissions(user);
 
     // Show Modal
     const modalEl = document.getElementById('userManagementModal');
@@ -206,50 +213,91 @@ window.openUserManagementModal = function (username) {
     }
 }
 
+function renderModulePermissions(user) {
+    const container = document.getElementById('modulePermissionsContainer');
+    if (!container) return;
+
+    const modules = [
+        { id: 'dashboardPage', label: 'Dashboard' },
+        { id: 'bookingPage', label: 'Booking' },
+        { id: 'buyerManagementPage', label: 'Trims - Buyer Library' },
+        { id: 'reportPage', label: 'Trims - Reports' },
+        { id: 'embEntryPage', label: 'Emb Entry' },
+        { id: 'embReportPage', label: 'Emb Report' },
+        { id: 'buyerNotesPage', label: 'Buyer Notes' },
+        { id: 'merchandisingPage', label: 'Merchandising (Packing List)' },
+        { id: 'merchandisingBuyersPage', label: 'Merch - Manage Buyers' },
+        { id: 'myTasksPage', label: 'My Tasks' },
+        { id: 'myDiaryPage', label: 'My Diary' },
+        { id: 'profilePage', label: 'My Profile' }
+    ];
+
+    let html = '';
+    modules.forEach(mod => {
+        const isChecked = user.allowedModules && user.allowedModules.includes(mod.id) ? 'checked' : '';
+        html += `
+            <div class="perm-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                <span class="perm-label">${mod.label}</span>
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input perm-check" type="checkbox" value="${mod.id}" id="perm_${mod.id}" ${isChecked}>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+
 window.saveUserManagement = async function () {
     if (!editingUserUsername) return;
 
-    // A. Gather Data from Manage Tab
-    const roleSelect = document.getElementById('manageRoleSelect');
-    const passInput = document.getElementById('managePasswordInput');
+    const role = document.getElementById('manageRoleSelect').value;
+    const defaultPage = document.getElementById('manageDefaultPage').value;
+    const zoomLevel = document.getElementById('manageZoomLevel').value;
+    // Password (optional)
+    const password = document.getElementById('managePasswordInput').value;
 
-    if (!roleSelect) return;
-
-    const newRole = roleSelect.value;
-    const newPassword = passInput ? passInput.value.trim() : '';
-
-    const defaultPageSelect = document.getElementById('manageDefaultPage');
-
-    // B. Gather Data from Privileges Tab
+    // Collect Permissions
     const allowedModules = [];
     document.querySelectorAll('.perm-check:checked').forEach(cb => {
         allowedModules.push(cb.value);
     });
 
-    const updateData = {
-        role: newRole,
-        allowedModules: allowedModules,
-        defaultPage: defaultPageSelect ? defaultPageSelect.value : 'dashboardPage',
-        zoomLevel: document.getElementById('manageZoomLevel') ? document.getElementById('manageZoomLevel').value : '100'
-    };
-    if (newPassword) updateData.password = newPassword;
-
     try {
         const userRef = doc(db, "users", editingUserUsername);
+        const updateData = {
+            role: role,
+            defaultPage: defaultPage,
+            zoomLevel: zoomLevel,
+            allowedModules: allowedModules
+        };
+
+        if (password && password.trim() !== "") {
+            updateData.password = password.trim();
+        }
+
+        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
         await updateDoc(userRef, updateData);
 
-        showToast('✅ User updated successfully!', 'success');
+        // Update Cache
+        const userIdx = usersCache.findIndex(u => u.username === editingUserUsername);
+        if (userIdx !== -1) {
+            usersCache[userIdx] = { ...usersCache[userIdx], ...updateData };
+        }
+
+        showToast(`User ${editingUserUsername} updated successfully!`, 'success');
 
         // Close Modal
         const modalEl = document.getElementById('userManagementModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        if (modalInstance) modalInstance.hide();
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
 
-        await loadUserList();
+        // Refresh Table
+        renderUserList();
 
     } catch (error) {
-        console.error("Update Error:", error);
-        showToast('❌ Update failed: ' + error.message, 'error');
+        console.error("Error updating user:", error);
+        showToast("Failed to update user.", 'error');
     }
 }
 
@@ -496,7 +544,41 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
-// Hook into initSettings to handle new tab
-const originalInit = initSettings;
-// We don't need to wrap it if we just modify the switch logic in the existing initSettings or adding listeners here
-// But since I am editing the file, I will just ensure the tab listener handles it.
+// --- End of System Settings ---
+
+// --- WhatsApp Template Management ---
+async function loadWhatsAppTemplates() {
+    const { getWhatsAppTemplate } = await import('./systemSettings.js');
+
+    // Load EMB Send Selected template
+    const embSendSelected = document.getElementById('template_emb_send_selected');
+    if (embSendSelected) {
+        const template = await getWhatsAppTemplate('emb_send_selected');
+        embSendSelected.value = template;
+    }
+
+    // Load EMB Full Report template
+    const embFullReport = document.getElementById('template_emb_full_report');
+    if (embFullReport) {
+        const template = await getWhatsAppTemplate('emb_full_report');
+        embFullReport.value = template;
+    }
+}
+
+window.saveWhatsAppTemplate = async function (templateKey) {
+    const { updateWhatsAppTemplate } = await import('./systemSettings.js');
+
+    const textarea = document.getElementById(`template_${templateKey}`);
+    if (!textarea) {
+        showToast('Template field not found!', 'danger');
+        return;
+    }
+
+    const content = textarea.value.trim();
+    if (!content) {
+        showToast('Template cannot be empty!', 'warning');
+        return;
+    }
+
+    await updateWhatsAppTemplate(templateKey, content);
+}

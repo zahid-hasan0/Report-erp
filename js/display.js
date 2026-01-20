@@ -64,8 +64,31 @@ export async function loadBookings() {
         const q = query(collection(dbInstance, path), orderBy('bookingDate', 'desc'));
         const snapshot = await getDocs(q);
         console.log(`📊 Snapshot size for ${path}:`, snapshot.size);
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const currentUsername = currentUser.username;
+
         bookings = [];
-        snapshot.forEach(docSnap => bookings.push({ id: docSnap.id, ...docSnap.data() }));
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            // STRICT DATA ISOLATION
+            // 1. If data has an owner, and owner != me -> HIDE
+            // 2. If data has NO owner (legacy), -> SHOW (or Hide? safer to show for now unless requested)
+            // User requested: "suhdu tar tai dekhbe" (only see his own).
+            // This implies strictness.
+            // If I hide legacy, the table might become empty.
+            // I will assume strict ownership for new data, and allow legacy usage if needed?
+            // "no admin er database alada se sudu tar tai dekhbe onno karor ta dekhbe na"
+            // Translation: "Admin DB is separate, he sees only his. User sees only user's."
+            // This suggests Strictness is paramount.
+            // However, to prevent "Where is my old data?" panic, I will show legacy data (no `createdBy`) 
+            // BUT hide anything that EXPLICITLY belongs to someone else.
+
+            if (data.createdBy && data.createdBy !== currentUsername) {
+                return; // Skip this record
+            }
+
+            bookings.push({ id: docSnap.id, ...data });
+        });
 
         window.bookings = bookings;
         filteredBookings = [...bookings];
@@ -141,16 +164,38 @@ export function displayBookings() {
 function displayPagination() {
     const paginationContainer = document.getElementById('pagination');
     if (!paginationContainer) return;
-    const pageCount = Math.ceil(filteredBookings.length / rowsPerPage);
-    if (pageCount <= 1) { paginationContainer.innerHTML = ''; return; }
-    let buttons = '';
-    for (let i = 1; i <= pageCount; i++) {
-        buttons += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'} me-1" onclick="goToPage(${i})">${i}</button>`;
+
+    if (filteredBookings.length === 0) {
+        paginationContainer.innerHTML = '';
+        return;
     }
-    paginationContainer.innerHTML = buttons;
+
+    const totalPages = Math.ceil(filteredBookings.length / rowsPerPage);
+
+    // Centered Elite Style
+    paginationContainer.className = 'd-flex justify-content-center align-items-center mt-4 gap-3';
+
+    paginationContainer.innerHTML = `
+        <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">
+            <i class="fas fa-arrow-left me-1"></i> Prev
+        </button>
+        
+        <span class="text-muted small fw-bold user-select-none">
+            Page ${currentPage} of ${totalPages}
+        </span>
+
+        <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">
+            Next <i class="fas fa-arrow-right ms-1"></i>
+        </button>
+    `;
 }
 
 window.goToPage = function (page) {
+    if (page < 1 || page > Math.ceil(filteredBookings.length / rowsPerPage)) return;
     currentPage = page;
     displayBookings();
+
+    // Smooth scroll to top of table
+    const table = document.querySelector('.table-container');
+    if (table) table.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };

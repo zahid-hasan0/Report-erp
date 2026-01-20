@@ -103,9 +103,12 @@ function updateStats() {
     const today = new Date().toISOString().split('T')[0];
     const doneToday = tasks.filter(t => t.status === 'Completed' && t.completedAt?.startsWith(today)).length;
 
-    document.getElementById('stat-active').textContent = active;
-    document.getElementById('stat-high').textContent = high;
-    document.getElementById('stat-done').textContent = doneToday;
+    const activeEl = document.getElementById('stat-active');
+    if (activeEl) {
+        activeEl.textContent = active;
+        document.getElementById('stat-high').textContent = high;
+        document.getElementById('stat-done').textContent = doneToday;
+    }
 }
 
 function renderTasks() {
