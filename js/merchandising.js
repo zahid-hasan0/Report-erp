@@ -237,13 +237,9 @@ function listenToEntries(buyerName) {
 
         unsubscribeEntries = onSnapshot(q, (snapshot) => {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            // Strict Filtering: Only show entries created by me
-            loadedEntries = snapshot.docs
-                .map(doc => ({ id: doc.id, ...doc.data() }))
-                .filter(item => {
-                    // Show if I created it OR if it has no creator (legacy data support)
-                    return item.createdBy === currentUser.username || !item.createdBy;
-                });
+
+            // OPEN ACCESS: Everyone can see all entries (requested by user)
+            loadedEntries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             // Combined sort: Date desc, then timestamp desc
             loadedEntries.sort((a, b) => {
